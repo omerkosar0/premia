@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Premia — Fenerbahçe Beko Sponsorship Intelligence Report</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  font-family:'Inter',Arial,sans-serif;
+  background:#fff;
+  color:#111;
+  font-size:11pt;
+}
+
+/* ── PAGE SETUP ───────────────────────── */
+.page{
+  width:210mm;
+  min-height:297mm;
+  padding:16mm 18mm;
+  page-break-after:always;
+  position:relative;
+  background:#fff;
+  overflow:hidden;
+}
+.page:last-child{page-break-after:auto}
+
+@media print{
+  body{background:#fff}
+  .page{
+    width:210mm;
+    min-height:297mm;
+    margin:0;
+    padding:16mm 18mm;
+  }
+}
+
+@media screen{
+  body{background:#E8EAF0;padding:20px 0}
+  .page{
+    margin:0 auto 24px;
+    box-shadow:0 4px 24px rgba(0,0,0,.14);
+  }
+}
+
+/* ── COLORS ───────────────────────────── */
+:root{
+  --navy:#1A2E4A;
+  --gold:#C9A84C;
+  --teal:#1E6B8A;
+  --green:#0F6E56;
+  --light:#F4F7FA;
+  --border:#DDE3EB;
+  --muted:#6B7280;
+  --warn:#D97706;
+}
+
+/* ── COMMON ───────────────────────────── */
+.gold{color:var(--gold)}
+.navy{color:var(--navy)}
+.teal{color:var(--teal)}
+.green{color:var(--green)}
+.muted{color:var(--muted)}
+.warn{color:var(--warn)}
+
+.label{
+  font-size:7.5pt;
+  font-weight:700;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:3px;
+}
+
+/* ── PAGE HEADER ──────────────────────── */
+.page-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding-bottom:8px;
+  border-bottom:1.5px solid var(--navy);
+  margin-bottom:14px;
+}
+.wordmark{
+  font-size:13pt;
+  font-weight:700;
+  letter-spacing:3px;
+  color:var(--navy);
+}
+.wordmark span{color:var(--gold)}
+.header-right{text-align:right;font-size:7.5pt;color:var(--muted)}
+
+/* ── PAGE FOOTER ──────────────────────── */
+.page-footer{
+  position:absolute;
+  bottom:10mm;
+  left:18mm;
+  right:18mm;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:7pt;
+  color:var(--muted);
+  border-top:0.5px solid var(--border);
+  padding-top:5px;
+}
+
+/* ══════════════════════════════════════
+   PAGE 1 — COVER
+══════════════════════════════════════ */
+.cover-band{
+  background:var(--navy);
+  margin:-16mm -18mm 0;
+  padding:18mm 18mm 14mm;
+  margin-bottom:16px;
+}
+.cover-eyebrow{
+  font-size:8pt;
+  font-weight:600;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:rgba(201,168,76,.8);
+  margin-bottom:8px;
+}
+.cover-title{
+  font-size:22pt;
+  font-weight:700;
+  color:#fff;
+  line-height:1.15;
+  letter-spacing:-.3px;
+  margin-bottom:5px;
+}
+.cover-sub{
+  font-size:11pt;
+  color:rgba(255,255,255,.55);
+  font-weight:300;
+}
+.cover-meta{
+  display:flex;
+  gap:20px;
+  margin-top:12px;
+}
+.cover-meta-item{
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:6px;
+  padding:7px 14px;
+}
+.cover-meta-label{font-size:7pt;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em}
+.cover-meta-val{font-size:10pt;font-weight:600;color:#fff;margin-top:2px}
+
+.hero-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:14px 0;
+}
+.hero-card{
+  background:var(--light);
+  border:0.5px solid var(--border);
+  border-radius:8px;
+  padding:12px 14px;
+  text-align:center;
+}
+.hero-card.accent{
+  background:var(--navy);
+  border-color:var(--navy);
+}
+.hero-value{
+  font-size:26pt;
+  font-weight:700;
+  color:var(--navy);
+  line-height:1;
+  margin:4px 0;
+}
+.hero-card.accent .hero-value{color:#fff}
+.hero-card.accent .label{color:rgba(255,255,255,.5)}
+.hero-sub{font-size:8pt;color:var(--muted);margin-top:2px}
+.hero-card.accent .hero-sub{color:rgba(255,255,255,.4)}
+
+.gap-banner{
+  background:#FEF3C7;
+  border:1px solid #FCD34D;
+  border-radius:8px;
+  padding:11px 14px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:12px 0;
+}
+.gap-icon{
+  font-size:20pt;
+  color:var(--warn);
+}
+.gap-text{font-size:9.5pt;color:#92400E;line-height:1.5}
+.gap-text strong{color:#78350F}
+
+.methodology-box{
+  background:var(--light);
+  border-left:3px solid var(--teal);
+  border-radius:0 6px 6px 0;
+  padding:10px 12px;
+  margin-top:10px;
+}
+.methodology-box p{font-size:8pt;color:var(--muted);line-height:1.6;margin:0}
+.methodology-box strong{color:var(--navy)}
+
+/* ══════════════════════════════════════
+   PAGE 2 — BROADCAST ASSETS
+══════════════════════════════════════ */
+.section-title{
+  font-size:13pt;
+  font-weight:700;
+  color:var(--navy);
+  margin-bottom:4px;
+  padding-bottom:6px;
+  border-bottom:1.5px solid var(--border);
+}
+.section-title span{
+  font-size:8pt;
+  font-weight:400;
+  color:var(--muted);
+  margin-left:8px;
+}
+
+.data-table{
+  width:100%;
+  border-collapse:collapse;
+  margin:10px 0;
+  font-size:9pt;
+}
+.data-table thead tr{
+  background:var(--navy);
+}
+.data-table thead th{
+  color:#fff;
+  font-weight:600;
+  font-size:7.5pt;
+  letter-spacing:.05em;
+  padding:7px 9px;
+  text-align:left;
+}
+.data-table thead th.r{text-align:right}
+.data-table tbody tr:nth-child(even){background:#F9FAFB}
+.data-table tbody tr:hover{background:#EEF2FF}
+.data-table td{
+  padding:7px 9px;
+  border-bottom:0.5px solid var(--border);
+  vertical-align:middle;
+}
+.data-table td.r{text-align:right;font-weight:600}
+.data-table td.val{text-align:right;font-weight:700;color:var(--green)}
+.data-table tfoot td{
+  padding:8px 9px;
+  font-weight:700;
+  border-top:1.5px solid var(--navy);
+  color:var(--navy);
+}
+.data-table tfoot td.r{text-align:right}
+.data-table tfoot td.val{color:var(--green);text-align:right}
+
+.asset-primary{font-weight:600;color:var(--navy)}
+.asset-cat{font-size:7.5pt;color:var(--muted);margin-top:1px}
+
+.qi-pill{
+  display:inline-block;
+  padding:2px 7px;
+  border-radius:10px;
+  font-size:7.5pt;
+  font-weight:600;
+}
+.qi-ex{background:#ECFDF5;color:#065F46}
+.qi-go{background:#EFF6FF;color:#1E40AF}
+.qi-av{background:#F3F4F6;color:#374151}
+.qi-po{background:#FEF3C7;color:#92400E}
+
+.chart-bar-wrap{margin:10px 0}
+.chart-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.chart-label{font-size:8pt;color:var(--navy);width:140px;flex-shrink:0;font-weight:500}
+.chart-bar-bg{flex:1;height:14px;background:#F3F4F6;border-radius:3px;overflow:hidden}
+.chart-bar-fill{height:100%;border-radius:3px;background:var(--navy)}
+.chart-val{font-size:8pt;font-weight:700;color:var(--green);width:54px;text-align:right;flex-shrink:0}
+
+/* ══════════════════════════════════════
+   PAGE 3 — SOCIAL
+══════════════════════════════════════ */
+.social-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:10px 0;
+}
+.social-card{
+  background:var(--light);
+  border:0.5px solid var(--border);
+  border-radius:8px;
+  padding:11px 13px;
+}
+.social-platform{font-size:9.5pt;font-weight:700;color:var(--navy);margin-bottom:6px}
+.social-row{display:flex;justify-content:space-between;font-size:8pt;margin-bottom:3px}
+.social-row .k{color:var(--muted)}
+.social-row .v{font-weight:600;color:var(--navy)}
+.social-row .g{font-weight:700;color:var(--green)}
+
+.insight-card{
+  background:var(--navy);
+  border-radius:8px;
+  padding:13px 15px;
+  margin-top:10px;
+}
+.insight-card .label{color:rgba(201,168,76,.8)}
+.insight-card p{font-size:9pt;color:rgba(255,255,255,.8);line-height:1.65;margin-top:4px}
+.insight-card strong{color:#fff}
+.insight-card .warn{color:#FCD34D}
+
+.comp-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+  font-size:8.5pt;
+}
+.comp-table th{
+  background:var(--light);
+  font-size:7.5pt;
+  font-weight:700;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  padding:6px 9px;
+  text-align:left;
+  border-bottom:1px solid var(--border);
+}
+.comp-table th.r{text-align:right}
+.comp-table td{
+  padding:6px 9px;
+  border-bottom:0.5px solid var(--border);
+  color:#374151;
+}
+.comp-table td.r{text-align:right;font-weight:600;color:var(--navy)}
+.comp-table tr.highlight td{background:#ECFDF5;font-weight:600;color:var(--green)}
+.comp-table tr.highlight td.r{color:var(--green)}
+
+/* ══════════════════════════════════════
+   PAGE 4 — STRATEGY
+══════════════════════════════════════ */
+.finding-card{
+  border:0.5px solid var(--border);
+  border-radius:8px;
+  padding:12px 14px;
+  margin-bottom:9px;
+}
+.finding-num{
+  font-size:7.5pt;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--gold);
+  margin-bottom:4px;
+}
+.finding-title{font-size:10.5pt;font-weight:700;color:var(--navy);margin-bottom:4px}
+.finding-body{font-size:8.5pt;color:#374151;line-height:1.6}
+.finding-body strong{color:var(--navy)}
+
+.rec-row{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  margin-bottom:7px;
+}
+.rec-dot{
+  width:20px;height:20px;
+  border-radius:50%;
+  background:var(--navy);
+  color:#fff;
+  font-size:8pt;
+  font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  margin-top:1px;
+}
+.rec-text{font-size:8.5pt;color:#374151;line-height:1.55}
+.rec-text strong{color:var(--navy)}
+
+.premia-cta{
+  background:var(--navy);
+  border-radius:8px;
+  padding:14px 16px;
+  margin-top:12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+.cta-left{}
+.cta-eyebrow{font-size:7.5pt;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.cta-headline{font-size:12pt;font-weight:700;color:#fff;margin-bottom:3px}
+.cta-body{font-size:8pt;color:rgba(255,255,255,.6);line-height:1.5}
+.cta-right{flex-shrink:0;text-align:right}
+.cta-wordmark{font-size:18pt;font-weight:700;letter-spacing:3px;color:#fff}
+.cta-wordmark span{color:var(--gold)}
+.cta-tagline{font-size:7.5pt;color:rgba(255,255,255,.4);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+
+.conf-note{
+  font-size:7pt;
+  color:var(--muted);
+  text-align:center;
+  margin-top:10px;
+  font-style:italic;
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     PAGE 1 — EXECUTIVE SUMMARY
+══════════════════════════════════ -->
+<div class="page">
+
+  <div class="cover-band">
+    <div class="cover-eyebrow">Premia Sports Intelligence · Confidential</div>
+    <div class="cover-title">Fenerbahçe Beko<br>Sponsorship Valuation Report</div>
+    <div class="cover-sub">Full-season commercial asset analysis · 2025–26 EuroLeague</div>
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Season</div>
+        <div class="cover-meta-val">2025–26 EuroLeague</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">League games</div>
+        <div class="cover-meta-val">38 games</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Avg live audience</div>
+        <div class="cover-meta-val">1,350,000</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Markets</div>
+        <div class="cover-meta-val">Turkey + 12 Europe</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="label">Total sponsorship package — annual media value</div>
+  <div class="hero-grid">
+    <div class="hero-card accent">
+      <div class="label" style="color:rgba(255,255,255,.4)">Annual media value</div>
+      <div class="hero-value">€25.9M</div>
+      <div class="hero-sub">All broadcast + social assets · 38 games</div>
+    </div>
+    <div class="hero-card">
+      <div class="label">Fair deal range</div>
+      <div class="hero-value" style="color:var(--teal)">€10.4–15.5M</div>
+      <div class="hero-sub">40–60% of verified media value</div>
+    </div>
+    <div class="hero-card">
+      <div class="label">Broadcast value</div>
+      <div class="hero-value" style="font-size:20pt">€25.4M</div>
+      <div class="hero-sub">8 assets · TV + streaming</div>
+    </div>
+    <div class="hero-card">
+      <div class="label">Social & digital value</div>
+      <div class="hero-value" style="font-size:20pt">€456K</div>
+      <div class="hero-sub">4 platforms · 38 matchdays</div>
+    </div>
+  </div>
+
+  <div class="gap-banner">
+    <div class="gap-icon">▲</div>
+    <div class="gap-text">
+      <strong>The commercial gap:</strong> clubs without independent valuation data typically price deals at 28–32% of verified media value. At 30%, Fenerbahçe Beko's current sponsorship income from broadcast-visible assets is estimated at <strong>~€7.8M/year</strong> — leaving <strong>€3.6–7.7M per year on the table</strong> relative to the fair deal range.
+    </div>
+  </div>
+
+  <div class="methodology-box">
+    <p><strong>Methodology:</strong> Media value calculated using the industry-standard CPM-weighted exposure model — identical to the approach used by Nielsen Sports and Relo Metrics. Formula: <strong>visible_seconds × (audience/1,000) × quality_index × (CPM/30,000)</strong>. Broadcast CPM benchmarked at €10 (weighted across Turkish domestic and international EuroLeague markets). Social value uses earned media CPM of €6 per 1,000 impressions. All figures in EUR.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>PREMIA · Sports Commercial Intelligence · Confidential</span>
+    <span>Page 1 of 4</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     PAGE 2 — BROADCAST ASSETS
+══════════════════════════════════ -->
+<div class="page">
+
+  <div class="page-header">
+    <div class="wordmark">PREMIA<span>.</span></div>
+    <div class="header-right">Fenerbahçe Beko · Broadcast Asset Analysis<br>2025–26 EuroLeague</div>
+  </div>
+
+  <div class="section-title">Broadcast asset valuation <span>per game + full season</span></div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width:32%">Asset</th>
+        <th class="r" style="width:9%">Secs</th>
+        <th style="width:18%">Quality index</th>
+        <th class="r" style="width:16%">Per game (€)</th>
+        <th class="r" style="width:14%">Annual (€)</th>
+        <th class="r" style="width:11%">% of total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><div class="asset-primary">Jersey — front (Beko)</div><div class="asset-cat">Primary kit asset · highest value</div></td>
+        <td class="r">800</td>
+        <td><span class="qi-pill qi-go">Good · 0.80</span></td>
+        <td class="val">€288,000</td>
+        <td class="val">€10,944,000</td>
+        <td class="r">42.3%</td>
+      </tr>
+      <tr>
+        <td><div class="asset-primary">Kit manufacturer (Adidas)</div><div class="asset-cat">Sleeve / chest mark</div></td>
+        <td class="r">520</td>
+        <td><span class="qi-pill qi-av">Average · 0.60</span></td>
+        <td class="val">€140,400</td>
+        <td class="val">€5,335,200</td>
+        <td class="r">20.6%</td>
+      </tr>
+      <tr>
+        <td><div class="asset-primary">Jersey — back / secondary</div><div class="asset-cat">Secondary kit asset</div></td>
+        <td class="r">280</td>
+        <td><span class="qi-pill qi-av">Average · 0.60</span></td>
+        <td class="val">€75,600</td>
+        <td class="val">€2,872,800</td>
+        <td class="r">11.1%</td>
+      </tr>
+      <tr>
+        <td><div class="asset-primary">LED perimeter boards</div><div class="asset-cat">In-venue · rotating slot</div></td>
+        <td class="r">360</td>
+        <td><span class="qi-pill qi-po">Poor · 0.40</span></td>
+        <td class="val">€64,800</td>
+        <td class="val">€2,462,400</td>
+        <td class="r">9.5%</td>
+      </tr>
+      <tr>
+        <td><div class="asset-primary">Shot clock / backboard</div><div class="asset-cat">In-venue · broadcast</div></td>
+        <td class="r">130</td>
+        <td><span class="qi-pill qi-av">Average · 0.60</span></td>
+        <td class="val">€35,100</td>
+        <td class="val">€1,333,800</td>
+        <td class="r">5.2%</td>
+      </tr>
+      <tr>
+        <td><div class="asset-primary">Coach kit</div><div class="asset-cat">Bench visibility</div></td>
+        <td class="r">170</td>
+        <td><span class="qi-pill qi-po">Poor · 0.40</span></td>
+        <td class="val">€30,600</td>
+        <td class="val">€1,162,800</td>
+        <td class="r">4.5%</td>
+      </tr>
+      <tr>
+        <td><div class="asset-primary">Broadcast graphic overlay</div><div class="asset-cat">On-screen branding</div></td>
+        <td class="r">40</td>
+        <td><span class="qi-pill qi-go">Good · 0.80</span></td>
+        <td class="val">€14,400</td>
+        <td class="val">€547,200</td>
+        <td class="r">2.1%</td>
+      </tr>
+      <tr>
+        <td><div class="asset-primary">Press backdrop</div><div class="asset-cat">Post-match media · clean logo</div></td>
+        <td class="r">45</td>
+        <td><span class="qi-pill qi-ex">Excellent · 1.00</span></td>
+        <td class="val">€20,250</td>
+        <td class="val">€769,500</td>
+        <td class="r">3.0%</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3"><strong>Broadcast total</strong></td>
+        <td class="val">€669,150</td>
+        <td class="val">€25,427,700</td>
+        <td class="r">—</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="label" style="margin-top:14px">Asset value distribution — annual (€)</div>
+  <div class="chart-bar-wrap">
+    <div class="chart-row">
+      <div class="chart-label">Jersey front (Beko)</div>
+      <div class="chart-bar-bg"><div class="chart-bar-fill" style="width:100%;background:var(--navy)"></div></div>
+      <div class="chart-val">€10.94M</div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-label">Kit manufacturer (Adidas)</div>
+      <div class="chart-bar-bg"><div class="chart-bar-fill" style="width:48.8%;background:var(--teal)"></div></div>
+      <div class="chart-val">€5.34M</div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-label">Jersey back</div>
+      <div class="chart-bar-bg"><div class="chart-bar-fill" style="width:26.3%;background:var(--teal)"></div></div>
+      <div class="chart-val">€2.87M</div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-label">LED perimeter boards</div>
+      <div class="chart-bar-bg"><div class="chart-bar-fill" style="width:22.5%;background:#9CA3AF)"></div></div>
+      <div class="chart-val">€2.46M</div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-label">All other assets</div>
+      <div class="chart-bar-bg"><div class="chart-bar-fill" style="width:16.7%;background:#D1D5DB"></div></div>
+      <div class="chart-val">€3.81M</div>
+    </div>
+  </div>
+
+  <div class="methodology-box">
+    <p><strong>Quality Index (QI)</strong> weights each placement by screen position and clarity: Excellent (1.0) = clean, centred, unobstructed · Good (0.8) = prominent, minor obstruction · Average (0.6) = partial visibility or edge placement · Poor (0.4) = fleeting or peripheral. Quality scores align with Nielsen Sports QI methodology.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>PREMIA · Sports Commercial Intelligence · Confidential</span>
+    <span>Page 2 of 4</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     PAGE 3 — SOCIAL + BENCHMARK
+══════════════════════════════════ -->
+<div class="page">
+
+  <div class="page-header">
+    <div class="wordmark">PREMIA<span>.</span></div>
+    <div class="header-right">Fenerbahçe Beko · Social & Market Benchmark<br>2025–26 EuroLeague</div>
+  </div>
+
+  <div class="section-title">Social & digital media value <span>matchday activation per season</span></div>
+
+  <div class="social-grid">
+    <div class="social-card">
+      <div class="social-platform">Instagram @fbbasketbol</div>
+      <div class="social-row"><span class="k">Followers</span><span class="v">2,000,000</span></div>
+      <div class="social-row"><span class="k">Est. reach per post</span><span class="v">480,000</span></div>
+      <div class="social-row"><span class="k">Posts per game</span><span class="v">1</span></div>
+      <div class="social-row"><span class="k">Value per game</span><span class="g">€2,880</span></div>
+      <div class="social-row"><span class="k">Annual value</span><span class="g">€109,440</span></div>
+    </div>
+    <div class="social-card">
+      <div class="social-platform">Twitter / X @FBBasketbol</div>
+      <div class="social-row"><span class="k">Followers</span><span class="v">1,300,000</span></div>
+      <div class="social-row"><span class="k">Est. reach per post</span><span class="v">260,000</span></div>
+      <div class="social-row"><span class="k">Posts per game</span><span class="v">3 (live updates)</span></div>
+      <div class="social-row"><span class="k">Value per game</span><span class="g">€4,680</span></div>
+      <div class="social-row"><span class="k">Annual value</span><span class="g">€177,840</span></div>
+    </div>
+    <div class="social-card">
+      <div class="social-platform">Instagram Stories</div>
+      <div class="social-row"><span class="k">Est. reach per story</span><span class="v">280,000</span></div>
+      <div class="social-row"><span class="k">Stories per game</span><span class="v">2</span></div>
+      <div class="social-row"><span class="k">Sponsor frame overlay</span><span class="v">Yes</span></div>
+      <div class="social-row"><span class="k">Value per game</span><span class="g">€3,360</span></div>
+      <div class="social-row"><span class="k">Annual value</span><span class="g">€127,680</span></div>
+    </div>
+    <div class="social-card">
+      <div class="social-platform">YouTube highlights</div>
+      <div class="social-row"><span class="k">Est. reach per clip</span><span class="v">180,000</span></div>
+      <div class="social-row"><span class="k">Clips per game</span><span class="v">1</span></div>
+      <div class="social-row"><span class="k">Sponsor inclusion</span><span class="v">Yes</span></div>
+      <div class="social-row"><span class="k">Value per game</span><span class="g">€1,080</span></div>
+      <div class="social-row"><span class="k">Annual value</span><span class="g">€41,040</span></div>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:flex-end;margin:6px 0 12px">
+    <div style="background:var(--light);border:0.5px solid var(--border);border-radius:6px;padding:6px 14px;text-align:right">
+      <div class="label">Social total — annual</div>
+      <div style="font-size:14pt;font-weight:700;color:var(--green)">€456,000</div>
+    </div>
+  </div>
+
+  <div class="section-title">Market benchmark comparison <span>selected EuroLeague sponsorship deals</span></div>
+
+  <table class="comp-table">
+    <thead>
+      <tr>
+        <th>Club</th>
+        <th>Sponsor</th>
+        <th>Asset</th>
+        <th class="r">Deal value (€/yr)</th>
+        <th class="r">Year</th>
+        <th>Source</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="highlight">
+        <td>Fenerbahçe Beko</td>
+        <td>Beko</td>
+        <td>Jersey front naming</td>
+        <td class="r">est. €4,000,000</td>
+        <td class="r">2018</td>
+        <td>Reported</td>
+      </tr>
+      <tr>
+        <td>Olympiacos BC</td>
+        <td>Bwin</td>
+        <td>Jersey front</td>
+        <td class="r">€2,000,000</td>
+        <td class="r">2018</td>
+        <td>Confirmed</td>
+      </tr>
+      <tr>
+        <td>Olympiacos BC</td>
+        <td>Winmasters</td>
+        <td>Jersey front</td>
+        <td class="r">est. €1,800,000</td>
+        <td class="r">2023</td>
+        <td>Reported</td>
+      </tr>
+      <tr>
+        <td>Real Madrid Baloncesto</td>
+        <td>Autohero</td>
+        <td>Jersey front</td>
+        <td class="r">est. €2,500,000</td>
+        <td class="r">2023</td>
+        <td>Reported</td>
+      </tr>
+      <tr>
+        <td>Panathinaikos AKTOR</td>
+        <td>AKTOR Group</td>
+        <td>Jersey naming</td>
+        <td class="r">est. €2,000,000</td>
+        <td class="r">2022</td>
+        <td>Reported</td>
+      </tr>
+      <tr>
+        <td>Fenerbahçe SK (football)</td>
+        <td>Chobani</td>
+        <td>Jersey front (Europe)</td>
+        <td class="r">€4,000,000</td>
+        <td class="r">2025</td>
+        <td>Confirmed</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="insight-card">
+    <div class="label">Premia market intelligence insight</div>
+    <p>Based on the benchmark database, EuroLeague jersey front deals range from <strong>€1.8M–€4.0M per year</strong> for clubs of Fenerbahçe Beko's tier. Premia's valuation model shows the jersey front asset alone delivers <strong>€10.94M in annual media value</strong> — placing the current estimated deal at approximately <strong>37% of verified media value</strong>, below the 40–60% fair market range. The Fenerbahçe SK football club's identical €4M European jersey deal with Chobani (2025) confirms this asset class is priced at market rate — not above it.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>PREMIA · Sports Commercial Intelligence · Confidential</span>
+    <span>Page 3 of 4</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     PAGE 4 — STRATEGIC IMPLICATIONS
+══════════════════════════════════ -->
+<div class="page">
+
+  <div class="page-header">
+    <div class="wordmark">PREMIA<span>.</span></div>
+    <div class="header-right">Fenerbahçe Beko · Strategic Recommendations<br>2025–26 EuroLeague</div>
+  </div>
+
+  <div class="section-title">Key findings</div>
+
+  <div class="finding-card">
+    <div class="finding-num">Finding 01</div>
+    <div class="finding-title">The Beko naming deal is priced below fair market value</div>
+    <div class="finding-body">The jersey front asset generates <strong>€10.94M in annual media value</strong> based on verified audience data and CPM benchmarking. The estimated current deal at <strong>~€4M/year</strong> represents 37% of verified value — below the 40–60% fair market range used across European sports. At renewal, the data supports a counter-offer of <strong>€4.4M–€6.6M</strong> with full methodology documentation.</div>
+  </div>
+
+  <div class="finding-card">
+    <div class="finding-num">Finding 02</div>
+    <div class="finding-title">The Adidas kit deal is commercially aligned</div>
+    <div class="finding-body">The Adidas kit manufacturer deal at <strong>€10M/year</strong> (confirmed, 2025) covers the kit manufacturer asset which delivers <strong>€5.34M in broadcast media value</strong> annually. The deal is a broader commercial partnership that also includes design exclusivity, retail revenue share (65%), and amateur sports funding — making it appropriately valued when all components are considered.</div>
+  </div>
+
+  <div class="finding-card">
+    <div class="finding-num">Finding 03</div>
+    <div class="finding-title">LED and in-venue assets are significantly underpriced as a package</div>
+    <div class="finding-body">LED perimeter boards, shot clock, and coach kit together deliver <strong>€4.96M in annual media value</strong>. These assets are typically bundled and sold at a discount as secondary sponsorships. Based on benchmark data, there is a strong case for unbundling and pricing the LED slot independently at <strong>€600K–€900K/year per sponsor rotation</strong>.</div>
+  </div>
+
+  <div class="section-title" style="margin-top:12px">Recommendations</div>
+
+  <div class="rec-row">
+    <div class="rec-dot">1</div>
+    <div class="rec-text"><strong>Beko renewal:</strong> Initiate renewal negotiation with independent valuation data. Counter-offer range: <strong>€4.4M–€5.5M/year</strong>. Present Premia's methodology as third-party verification. Use the Fenerbahçe football Chobani deal (€4M for European-only jersey) as the floor anchor.</div>
+  </div>
+  <div class="rec-row">
+    <div class="rec-dot">2</div>
+    <div class="rec-text"><strong>LED board unbundling:</strong> Separate LED rotation from bundled secondary packages. Price each rotation slot at €600K–€900K/year based on verified media value. At 6 rotating sponsors per game, annual LED revenue potential: <strong>€2.4M–€3.6M</strong>.</div>
+  </div>
+  <div class="rec-row">
+    <div class="rec-dot">3</div>
+    <div class="rec-text"><strong>Press backdrop activation:</strong> The press backdrop has the highest quality index (1.0) of any asset — clean, unobstructed, camera-facing. Currently under-commercialised. Target brands in consumer electronics, beverages, or financial services seeking premium media quality. Benchmark pricing: <strong>€400K–€700K/year</strong>.</div>
+  </div>
+  <div class="rec-row">
+    <div class="rec-dot">4</div>
+    <div class="rec-text"><strong>Social media formalisation:</strong> Current social media sponsor integrations deliver <strong>€456K/year in media value</strong> but are typically offered as add-ons rather than priced assets. Formalise social packages at <strong>€180K–€300K/year</strong> per primary sponsor as a standalone product.</div>
+  </div>
+
+  <div class="premia-cta">
+    <div class="cta-left">
+      <div class="cta-eyebrow">About this report</div>
+      <div class="cta-headline">Premia Sports Intelligence</div>
+      <div class="cta-body">Premia delivers real-time sponsorship valuation intelligence for European sports clubs. Every asset. Every game. Updated within 24 hours. The platform gives commercial directors the independent data to price accurately, benchmark against the market, and grow sponsorship revenue systematically.</div>
+    </div>
+    <div class="cta-right">
+      <div class="cta-wordmark">PREMIA<span>.</span></div>
+      <div class="cta-tagline">Sports Commercial Intelligence</div>
+    </div>
+  </div>
+
+  <div class="conf-note">This report is produced by Premia and is strictly confidential. All valuations are based on publicly available audience data and industry-standard CPM methodology. Deal value estimates marked as such are derived from comparable transactions and should be treated as indicative ranges only. Not for distribution without consent.</div>
+
+  <div class="page-footer">
+    <span>PREMIA · Sports Commercial Intelligence · Confidential</span>
+    <span>Page 4 of 4</span>
+  </div>
+</div>
+
+</body>
+</html>

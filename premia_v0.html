@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premia — Sports Commercial Intelligence</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F0F2F5;color:#111;height:100vh;display:flex;overflow:hidden}
+
+  /* ── SIDEBAR ── */
+  #sidebar{width:230px;min-width:230px;background:#1A2E4A;display:flex;flex-direction:column;height:100vh}
+  .sb-logo{padding:22px 20px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .sb-wordmark{font-size:22px;font-weight:700;color:#fff;letter-spacing:1.5px}
+  .sb-sub{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.12em;text-transform:uppercase;margin-top:3px}
+  .sb-nav{padding:14px 10px;flex:1}
+  .sb-section{font-size:9px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:.12em;text-transform:uppercase;padding:6px 10px 4px;margin-top:6px}
+  .nav-btn{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border:none;background:transparent;color:rgba(255,255,255,.5);font-size:13px;cursor:pointer;border-radius:7px;text-align:left;margin-bottom:1px;transition:all .15s}
+  .nav-btn:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.8)}
+  .nav-btn.active{background:rgba(201,168,76,.15);color:#C9A84C;font-weight:500}
+  .nav-icon{font-size:15px;width:18px;text-align:center}
+  .sb-footer{padding:14px 20px;border-top:1px solid rgba(255,255,255,.08)}
+  .sb-version{font-size:10px;color:rgba(255,255,255,.2)}
+  .sb-club-badge{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.25);border-radius:6px;padding:6px 10px;margin-top:8px}
+  .sb-club-name{font-size:12px;font-weight:600;color:#C9A84C}
+  .sb-club-sub{font-size:10px;color:rgba(255,255,255,.35);margin-top:1px}
+
+  /* ── MAIN ── */
+  #main{flex:1;overflow-y:auto;padding:28px 32px}
+  .page{display:none}
+  .page.active{display:block}
+  .page-title{font-size:22px;font-weight:700;color:#1A2E4A;letter-spacing:-.3px}
+  .page-sub{font-size:13px;color:#6B7280;margin-top:4px;margin-bottom:22px}
+
+  /* ── CARDS ── */
+  .card{background:#fff;border:0.5px solid #E5E7EB;border-radius:12px;padding:18px 22px;margin-bottom:14px}
+  .card-title{font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px}
+
+  /* ── CLUB PRESETS ── */
+  .preset-grid{display:flex;gap:8px;flex-wrap:wrap}
+  .preset-btn{padding:7px 16px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid #E5E7EB;background:#fff;color:#374151;transition:all .15s}
+  .preset-btn:hover{border-color:#1A2E4A;color:#1A2E4A}
+  .preset-btn.active{background:#1A2E4A;border-color:#1A2E4A;color:#fff}
+
+  /* ── GLOBAL PARAMS ── */
+  .params-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .param-label{font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;display:block}
+  .param-input{width:100%;padding:8px 10px;border:1px solid #E5E7EB;border-radius:8px;font-size:14px;color:#111;background:#fff;transition:border-color .15s}
+  .param-input:focus{outline:none;border-color:#1A2E4A}
+  .param-hint{font-size:10px;color:#9CA3AF;margin-top:3px}
+  .formula-bar{margin-top:12px;font-size:11px;font-family:monospace;color:#6B7280;background:#F9FAFB;padding:8px 12px;border-radius:6px;line-height:1.6}
+
+  /* ── TABLES ── */
+  .data-table{width:100%;border-collapse:collapse}
+  .data-table th{font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.06em;padding:0 10px 10px;text-align:left}
+  .data-table th.r{text-align:right}
+  .data-table td{padding:8px 10px;border-top:1px solid #F3F4F6;font-size:13px;vertical-align:middle}
+  .data-table td.r{text-align:right}
+  .data-table tr:hover td{background:#FAFAFA}
+  .asset-name{font-weight:500;color:#111}
+  .asset-cat{font-size:11px;color:#9CA3AF;margin-top:1px}
+  .val-green{font-weight:600;color:#059669}
+  .val-total{font-weight:700;color:#1A2E4A}
+  .tbl-input{width:72px;padding:5px 7px;border:1px solid #E5E7EB;border-radius:6px;font-size:12px;text-align:right;color:#111}
+  .tbl-input:focus{outline:none;border-color:#1A2E4A}
+  .tbl-select{padding:5px 7px;border:1px solid #E5E7EB;border-radius:6px;font-size:11px;color:#111;min-width:130px}
+  .tbl-select:focus{outline:none;border-color:#1A2E4A}
+
+  /* ── SUMMARY METRICS ── */
+  .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+  .metric-card{background:#fff;border:0.5px solid #E5E7EB;border-radius:10px;padding:14px 16px;text-align:center}
+  .metric-label{font-size:11px;color:#6B7280;margin-bottom:6px;font-weight:500}
+  .metric-value{font-size:22px;font-weight:700;color:#1A2E4A}
+  .metric-sub{font-size:10px;color:#9CA3AF;margin-top:3px}
+  .metric-warn{color:#D97706}
+
+  /* ── INSIGHT ── */
+  .insight{background:#ECFDF5;border:1px solid #A7F3D0;border-radius:10px;padding:14px 18px}
+  .insight-title{font-size:12px;font-weight:700;color:#065F46;margin-bottom:5px}
+  .insight-body{font-size:13px;color:#374151;line-height:1.65}
+  .insight-body strong{color:#1A2E4A}
+  .insight-body .warn{color:#D97706;font-weight:600}
+
+  /* ── BENCHMARK PAGE ── */
+  .coming-soon{display:flex;flex-direction:column;align-items:center;justify-content:center;height:50vh;text-align:center}
+  .cs-icon{font-size:48px;margin-bottom:16px;opacity:.3}
+  .cs-title{font-size:18px;font-weight:600;color:#1A2E4A;margin-bottom:8px}
+  .cs-sub{font-size:14px;color:#6B7280}
+
+  /* ── DIVIDER ── */
+  hr.section{border:none;border-top:1px solid #F3F4F6;margin:4px 0 14px}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<div id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-wordmark">PREMIA</div>
+    <div class="sb-sub">Sports Intelligence</div>
+  </div>
+
+  <div class="sb-nav">
+    <div class="sb-section">Core</div>
+    <button class="nav-btn active" onclick="nav('valuation')">
+      <span class="nav-icon">◈</span> Valuation Model
+    </button>
+    <button class="nav-btn" onclick="nav('benchmark')">
+      <span class="nav-icon">◉</span> Benchmark DB
+    </button>
+    <button class="nav-btn" onclick="nav('reports')">
+      <span class="nav-icon">◎</span> Reports
+    </button>
+    <div class="sb-section" style="margin-top:14px">Intelligence</div>
+    <button class="nav-btn" onclick="nav('sponsors')">
+      <span class="nav-icon">◇</span> Sponsor Matching
+    </button>
+    <button class="nav-btn" onclick="nav('forecast')">
+      <span class="nav-icon">△</span> Revenue Forecast
+    </button>
+  </div>
+
+  <div class="sb-footer">
+    <div class="sb-club-badge" id="sb-club-badge">
+      <div class="sb-club-name" id="sb-club-name">Fenerbahçe Beko</div>
+      <div class="sb-club-sub" id="sb-club-sub">EuroLeague · Turkey</div>
+    </div>
+    <div class="sb-version" style="margin-top:10px">Premia v0.1 · localhost</div>
+  </div>
+</div>
+
+<!-- ══ MAIN CONTENT ══ -->
+<div id="main">
+
+  <!-- VALUATION MODEL -->
+  <div id="page-valuation" class="page active">
+    <div class="page-title">Valuation Model</div>
+    <div class="page-sub">Real-time sponsorship asset valuation · edit any input · results update instantly</div>
+
+    <!-- Club Presets -->
+    <div class="card">
+      <div class="card-title">Club preset</div>
+      <div class="preset-grid" id="preset-grid"></div>
+    </div>
+
+    <!-- Global Params -->
+    <div class="card">
+      <div class="card-title">Global parameters</div>
+      <div class="params-grid">
+        <div>
+          <span class="param-label">Live audience</span>
+          <input class="param-input" type="number" id="g-audience" step="50000" oninput="recalc()">
+          <div class="param-hint">viewers per game</div>
+        </div>
+        <div>
+          <span class="param-label">CPM — 30s spot (€)</span>
+          <input class="param-input" type="number" id="g-cpm" step="1" oninput="recalc()">
+          <div class="param-hint">per 1,000 viewers</div>
+        </div>
+        <div>
+          <span class="param-label">Social CPM (€)</span>
+          <input class="param-input" type="number" id="g-social-cpm" step="0.5" oninput="recalc()">
+          <div class="param-hint">earned media rate</div>
+        </div>
+        <div>
+          <span class="param-label">Games / season</span>
+          <input class="param-input" type="number" id="g-games" step="1" oninput="recalc()">
+          <div class="param-hint">inc. playoffs</div>
+        </div>
+      </div>
+      <div class="formula-bar">
+        formula: visible_seconds × (audience / 1,000) × quality_index × (CPM / 30,000)
+      </div>
+    </div>
+
+    <!-- Broadcast Assets -->
+    <div class="card">
+      <div class="card-title">Broadcast assets</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:36%">Asset</th>
+            <th class="r" style="width:13%">Seconds</th>
+            <th style="width:24%">Quality index</th>
+            <th class="r" style="width:13%">Per game</th>
+            <th class="r" style="width:14%">Annual</th>
+          </tr>
+        </thead>
+        <tbody id="bc-tbody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" style="padding:10px;font-weight:700;color:#1A2E4A;font-size:13px">Broadcast subtotal</td>
+            <td class="r" style="padding:10px" id="bc-pg-total">—</td>
+            <td class="r" style="padding:10px" id="bc-yr-total">—</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Social Assets -->
+    <div class="card">
+      <div class="card-title">Social & digital assets</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:36%">Platform</th>
+            <th class="r" style="width:19%">Reach / post</th>
+            <th class="r" style="width:14%">Posts</th>
+            <th class="r" style="width:15%">Per game</th>
+            <th class="r" style="width:16%">Annual</th>
+          </tr>
+        </thead>
+        <tbody id="sc-tbody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" style="padding:10px;font-weight:700;color:#1A2E4A;font-size:13px">Social subtotal</td>
+            <td class="r" style="padding:10px" id="sc-pg-total">—</td>
+            <td class="r" style="padding:10px" id="sc-yr-total">—</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Summary -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Value per game</div>
+        <div class="metric-value" id="sum-pg">—</div>
+        <div class="metric-sub">broadcast + social</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Annual media value</div>
+        <div class="metric-value" id="sum-yr">—</div>
+        <div class="metric-sub">full season</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Fair deal range</div>
+        <div class="metric-value" id="sum-deal" style="font-size:17px">—</div>
+        <div class="metric-sub">40–60% of media value</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Left on table</div>
+        <div class="metric-value metric-warn" id="sum-gap">—</div>
+        <div class="metric-sub">vs. typical 30% deal</div>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-title">Premia insight</div>
+      <div class="insight-body" id="insight-text">Loading…</div>
+    </div>
+  </div>
+
+  <!-- BENCHMARK DB -->
+  <div id="page-benchmark" class="page">
+    <div class="page-title">Benchmark Database</div>
+    <div class="page-sub">Real EuroLeague sponsorship deals — the data moat</div>
+    <div class="coming-soon">
+      <div class="cs-icon">◉</div>
+      <div class="cs-title">Building next session</div>
+      <div class="cs-sub">20 verified EuroLeague deals sourced from SportBusiness, Sportcal, and club press releases</div>
+    </div>
+  </div>
+
+  <!-- REPORTS -->
+  <div id="page-reports" class="page">
+    <div class="page-title">Report Generator</div>
+    <div class="page-sub">One-click PDF valuation reports for clubs</div>
+    <div class="coming-soon">
+      <div class="cs-icon">◎</div>
+      <div class="cs-title">Building next session</div>
+      <div class="cs-sub">4-page PDF reports you hand to a club commercial director at a meeting</div>
+    </div>
+  </div>
+
+  <!-- SPONSOR MATCHING -->
+  <div id="page-sponsors" class="page">
+    <div class="page-title">Sponsor Matching</div>
+    <div class="page-sub">AI-ranked brand categories by fit for this club</div>
+    <div class="coming-soon">
+      <div class="cs-icon">◇</div>
+      <div class="cs-title">Coming in V1</div>
+      <div class="cs-sub">Ranks top 50 brand categories by fit, deal probability, and audience alignment</div>
+    </div>
+  </div>
+
+  <!-- REVENUE FORECAST -->
+  <div id="page-forecast" class="page">
+    <div class="page-title">Revenue Forecast</div>
+    <div class="page-sub">12-24 month commercial pipeline projection</div>
+    <div class="coming-soon">
+      <div class="cs-icon">△</div>
+      <div class="cs-title">Coming in V1</div>
+      <div class="cs-sub">Renewal probability, pipeline value, and P&L bridge for the club CFO</div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ══ DATA ══════════════════════════════════════════════════
+
+const CLUBS = {
+  fener:     { name:'Fenerbahçe Beko',        sub:'EuroLeague · Turkey',  audience:1350000, cpm:10, scpm:6, games:38 },
+  efes:      { name:'Anadolu Efes',            sub:'EuroLeague · Turkey',  audience:1100000, cpm:9,  scpm:5, games:38 },
+  madrid:    { name:'Real Madrid Baloncesto',  sub:'EuroLeague · Spain',   audience:1800000, cpm:13, scpm:7, games:38 },
+  barcelona: { name:'FC Barcelona Basketball', sub:'EuroLeague · Spain',   audience:1600000, cpm:12, scpm:7, games:38 },
+  olympiacos:{ name:'Olympiacos BC',           sub:'EuroLeague · Greece',  audience:900000,  cpm:9,  scpm:5, games:38 },
+  panathinaikos:{ name:'Panathinaikos AKTOR',  sub:'EuroLeague · Greece',  audience:950000,  cpm:9,  scpm:5, games:38 },
+  milan:     { name:'EA7 Emporio Armani Milan',sub:'EuroLeague · Italy',   audience:820000,  cpm:10, scpm:5, games:38 },
+};
+
+const QI = [
+  { label:'Excellent (1.0)', v:1.0 },
+  { label:'Good (0.8)',      v:0.8 },
+  { label:'Average (0.6)',   v:0.6 },
+  { label:'Poor (0.4)',      v:0.4 },
+  { label:'Minimal (0.2)',   v:0.2 },
+];
+
+let bcAssets = [
+  { id:'jf',  name:'Jersey — front (main sponsor)', cat:'Primary kit',          secs:800,  qi:0.8 },
+  { id:'jb',  name:'Jersey — back / secondary',     cat:'Secondary kit',        secs:280,  qi:0.6 },
+  { id:'km',  name:'Kit manufacturer mark',          cat:'Kit · sleeve/chest',  secs:520,  qi:0.6 },
+  { id:'led', name:'LED perimeter boards',           cat:'In-venue · broadcast', secs:360,  qi:0.4 },
+  { id:'sc',  name:'Shot clock / backboard',         cat:'In-venue · broadcast', secs:130,  qi:0.6 },
+  { id:'pb',  name:'Press backdrop',                 cat:'Post-match media',     secs:45,   qi:1.0 },
+  { id:'ck',  name:'Coach kit',                      cat:'Bench visibility',     secs:170,  qi:0.4 },
+  { id:'sg',  name:'Broadcast graphic overlay',      cat:'On-screen branding',   secs:40,   qi:0.8 },
+];
+
+let scAssets = [
+  { id:'ig', name:'Instagram — feed post',   cat:'Matchday · sponsor tag',   reach:480000, posts:1 },
+  { id:'tw', name:'Twitter / X',             cat:'Live match updates',        reach:260000, posts:3 },
+  { id:'st', name:'Instagram stories',       cat:'Sponsor frame overlay',     reach:280000, posts:2 },
+  { id:'yt', name:'YouTube highlight clip',  cat:'Post-match content',        reach:180000, posts:1 },
+];
+
+// ══ HELPERS ═══════════════════════════════════════════════
+
+function fmt(n) {
+  if (n >= 1e6) return '€' + (n/1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return '€' + Math.round(n/1e3) + 'K';
+  return '€' + Math.round(n);
+}
+function bc(secs, qi, aud, cpm) { return secs * (aud/1000) * qi * (cpm/30000); }
+function sc(reach, posts, scpm) { return reach * posts * (scpm/1000); }
+function g(id) { return document.getElementById(id); }
+
+// ══ NAVIGATION ════════════════════════════════════════════
+
+function nav(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  g('page-'+page).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ══ CLUB PRESETS ══════════════════════════════════════════
+
+let activeClub = 'fener';
+
+function buildPresets() {
+  const grid = g('preset-grid');
+  grid.innerHTML = '';
+  Object.entries(CLUBS).forEach(([id, club]) => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn' + (id === activeClub ? ' active' : '');
+    btn.textContent = club.name;
+    btn.onclick = () => loadClub(id);
+    grid.appendChild(btn);
+  });
+}
+
+function loadClub(id) {
+  activeClub = id;
+  const c = CLUBS[id];
+  g('g-audience').value = c.audience;
+  g('g-cpm').value = c.cpm;
+  g('g-social-cpm').value = c.scpm;
+  g('g-games').value = c.games;
+  g('sb-club-name').textContent = c.name;
+  g('sb-club-sub').textContent = c.sub;
+  buildPresets();
+  recalc();
+}
+
+// ══ TABLE BUILDERS ════════════════════════════════════════
+
+function buildBcTable() {
+  const tbody = g('bc-tbody');
+  tbody.innerHTML = '';
+  bcAssets.forEach(a => {
+    const tr = document.createElement('tr');
+    const qiOpts = QI.map(q => `<option value="${q.v}"${q.v===a.qi?' selected':''}>${q.label}</option>`).join('');
+    tr.innerHTML = `
+      <td>
+        <div class="asset-name">${a.name}</div>
+        <div class="asset-cat">${a.cat}</div>
+      </td>
+      <td class="r">
+        <input class="tbl-input" type="number" value="${a.secs}" min="0" max="7200" step="10"
+          onchange="bcAssets.find(x=>x.id==='${a.id}').secs=+this.value;recalc()">
+      </td>
+      <td>
+        <select class="tbl-select" onchange="bcAssets.find(x=>x.id==='${a.id}').qi=+this.value;recalc()">
+          ${qiOpts}
+        </select>
+      </td>
+      <td class="r val-green" id="bc-pg-${a.id}">—</td>
+      <td class="r val-green" id="bc-yr-${a.id}">—</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function buildScTable() {
+  const tbody = g('sc-tbody');
+  tbody.innerHTML = '';
+  scAssets.forEach(a => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div class="asset-name">${a.name}</div>
+        <div class="asset-cat">${a.cat}</div>
+      </td>
+      <td class="r">
+        <input class="tbl-input" type="number" value="${a.reach}" min="0" step="10000"
+          style="width:100px" onchange="scAssets.find(x=>x.id==='${a.id}').reach=+this.value;recalc()">
+      </td>
+      <td class="r">
+        <input class="tbl-input" type="number" value="${a.posts}" min="0" max="20"
+          style="width:60px" onchange="scAssets.find(x=>x.id==='${a.id}').posts=+this.value;recalc()">
+      </td>
+      <td class="r val-green" id="sc-pg-${a.id}">—</td>
+      <td class="r val-green" id="sc-yr-${a.id}">—</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ══ CALCULATION ═══════════════════════════════════════════
+
+function recalc() {
+  const aud  = +g('g-audience').value  || 0;
+  const cpm  = +g('g-cpm').value       || 0;
+  const scpm = +g('g-social-cpm').value|| 0;
+  const games= +g('g-games').value     || 0;
+
+  let bcTot = 0;
+  bcAssets.forEach(a => {
+    const pg = bc(a.secs, a.qi, aud, cpm);
+    bcTot += pg;
+    const pgEl = g('bc-pg-'+a.id);
+    const yrEl = g('bc-yr-'+a.id);
+    if (pgEl) { pgEl.textContent = fmt(pg); pgEl.className = 'r val-green'; }
+    if (yrEl) { yrEl.textContent = fmt(pg*games); yrEl.className = 'r val-green'; }
+  });
+
+  let scTot = 0;
+  scAssets.forEach(a => {
+    const pg = sc(a.reach, a.posts, scpm);
+    scTot += pg;
+    const pgEl = g('sc-pg-'+a.id);
+    const yrEl = g('sc-yr-'+a.id);
+    if (pgEl) { pgEl.textContent = fmt(pg); pgEl.className = 'r val-green'; }
+    if (yrEl) { yrEl.textContent = fmt(pg*games); yrEl.className = 'r val-green'; }
+  });
+
+  const totPg  = bcTot + scTot;
+  const totYr  = totPg * games;
+  const dealLo = totYr * 0.40;
+  const dealHi = totYr * 0.60;
+  const gap    = totYr * 0.70;
+
+  const setV = (id, val, cls) => { const el = g(id); if(el){el.textContent=val;if(cls)el.className=cls;} };
+  setV('bc-pg-total', fmt(bcTot), 'r val-total');
+  setV('bc-yr-total', fmt(bcTot*games), 'r val-total');
+  setV('sc-pg-total', fmt(scTot), 'r val-total');
+  setV('sc-yr-total', fmt(scTot*games), 'r val-total');
+  setV('sum-pg',   fmt(totPg));
+  setV('sum-yr',   fmt(totYr));
+  setV('sum-deal', fmt(dealLo)+'–'+fmt(dealHi));
+  setV('sum-gap',  fmt(gap));
+
+  const insight = g('insight-text');
+  if (insight) {
+    insight.innerHTML = `At current parameters, the full sponsorship package delivers <strong>${fmt(totYr)}</strong> in annual media value.
+    A commercially sophisticated club should price deals between <strong>${fmt(dealLo)}</strong> and <strong>${fmt(dealHi)}</strong>.
+    Without Premia, clubs typically sign at ~30% of media value — leaving <strong class="warn">${fmt(gap)}</strong> per year on the table.
+    This is the number you walk into every meeting with.`;
+  }
+}
+
+// ══ INIT ══════════════════════════════════════════════════
+
+buildPresets();
+buildBcTable();
+buildScTable();
+loadClub('fener');
+</script>
+</body>
+</html>
