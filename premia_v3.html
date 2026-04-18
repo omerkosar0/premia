@@ -350,7 +350,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
         <div class="p-hint">inc. playoffs</div>
       </div>
     </div>
-    <div class="formula">media value = visible_seconds × (audience / 1,000) × quality_index × (CPM / 30,000)</div>
+    <div class="formula">media value = visible_seconds × (audience / 1,000) × quality_index × (CPM / 30)</div>
   </div>
   <div class="card">
     <div class="card-hd">Broadcast assets</div>
@@ -765,7 +765,7 @@ function fmt(n){
   return '€'+Math.round(n);
 }
 function g(id){return document.getElementById(id)}
-function bc(s,q,a,c){return s*(a/1000)*q*(c/30000)}
+function bc(s,q,a,c){return s*(a/1000)*q*(c/30)}
 function sc_(r,p,sc){return r*p*(sc/1000)}
 
 // ══════════════════════════════════════════════════════════
