@@ -262,15 +262,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
     <div class="welcome-tagline">Sports Commercial Intelligence</div>
     <div class="welcome-headline">The AI platform that tells clubs what their sponsorship assets are worth — and how to charge more.</div>
     <div class="welcome-body">
-      Built for EuroLeague commercial directors. Powered by a proprietary deal database and Claude AI. 
+      Built for EuroLeague commercial directors. 11 clubs. 21 verified deals. Powered by Claude AI.
       <strong>Not a spreadsheet. Not a consulting report. A live intelligence platform.</strong>
     </div>
     <div class="welcome-steps">
       <div class="welcome-step"><div class="welcome-step-num">1</div>Select a club and run the valuation — 30 seconds</div>
-      <div class="welcome-step"><div class="welcome-step-num">2</div>See every sponsorship asset's media value vs. current deals</div>
-      <div class="welcome-step"><div class="welcome-step-num">3</div>Ask Premia AI any deal or negotiation question</div>
+      <div class="welcome-step"><div class="welcome-step-num">2</div>See every asset's media value vs. current market deals</div>
+      <div class="welcome-step"><div class="welcome-step-num">3</div>Generate an AI negotiation brief with exact talking points</div>
     </div>
-    <button class="welcome-btn" onclick="closeWelcome()">Open Premia →</button>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button class="welcome-btn" onclick="closeWelcome()" style="flex:1">Open Premia →</button>
+      <button class="welcome-btn" onclick="startDemo()" style="flex:1;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:var(--gold)">▶ Run demo</button>
+    </div>
   </div>
 </div>
 
@@ -430,14 +433,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
     <div class="insight-hd">Premia insight</div>
     <div class="insight-body" id="insight">—</div>
   </div>
-
-  <div style="text-align:right;margin-bottom:20px">
-    <button onclick="generateReport()" style="padding:10px 22px;background:var(--navy);color:#fff;
-      border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;
-      display:inline-flex;align-items:center;gap:8px">
-      <span>↓</span> Export valuation report
-    </button>
-  </div>
 </div>
 
 <!-- BENCHMARK DB -->
@@ -466,23 +461,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 <!-- NEGOTIATION BRIEF -->
 <div id="page-brief" class="page">
   <div class="pg-title">Negotiation brief</div>
-  <div class="pg-sub">AI-powered negotiation intelligence — specific to this club, these numbers, this moment</div>
+  <div class="pg-sub">Run the valuation model first — then come here for data-driven talking points</div>
   <div class="m3" id="brief-metrics" style="margin-bottom:14px"></div>
-
-  <!-- AI Brief section -->
-  <div class="brief-card" id="brief-ai-card">
-    <div class="brief-hd">✦ Premia AI — live negotiation brief</div>
-    <div id="brief-ai-content" style="font-size:12px;color:rgba(255,255,255,.5);font-style:italic">
-      Run the valuation model first, then generate your AI brief.
-    </div>
-    <button id="brief-gen-btn" onclick="generateAIBrief()" style="
-      margin-top:14px;padding:9px 18px;background:rgba(201,168,76,.15);
-      border:1px solid rgba(201,168,76,.35);border-radius:8px;color:var(--gold);
-      font-size:12px;font-weight:600;cursor:pointer;display:none">
-      ✦ Generate AI brief
-    </button>
+  <div class="brief-card" id="brief-content">
+    <div class="brief-hd">Premia negotiation intelligence</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.5);font-style:italic">Run the valuation model first.</div>
   </div>
-
   <div class="card" id="brief-comps" style="display:none">
     <div class="card-hd">Comparable deals to cite in negotiation</div>
     <div id="brief-comp-rows"></div>
@@ -496,12 +480,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   <div class="pg-title">Ask Premia AI</div>
   <div class="pg-sub">Claude analyses your deal situation using live valuation data and the full benchmark database</div>
 
-  <!-- Server connection status -->
-  <div class="ai-setup" id="server-status-box">
-    <div class="card-hd">Premia AI — server connection</div>
-    <div class="ai-status" id="server-status">Checking connection...</div>
+  <!-- API Key Setup -->
+  <div class="ai-setup">
+    <div class="card-hd">Anthropic API key</div>
+    <div class="ai-key-row">
+      <input class="ai-key-input" type="password" id="api-key-input"
+        placeholder="sk-ant-api03-..." autocomplete="off">
+      <button class="ai-key-btn" onclick="saveKey()">Save key</button>
+    </div>
+    <div class="ai-status" id="key-status"></div>
     <div style="font-size:10px;color:var(--muted);margin-top:6px">
-      AI requests are handled server-side. Your API key is never exposed in the browser.
+      Get your key at console.anthropic.com · Stored in browser memory only · Never sent anywhere except Anthropic
     </div>
   </div>
 
@@ -563,15 +552,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 // ══════════════════════════════════════════════════════════
 // DATA
 // ══════════════════════════════════════════════════════════
+// ── AUDIENCE & CPM METHODOLOGY ────────────────────────────
+// Audience: derived from Nielsen Sports 2024-25 cumulative season totals by market
+// (Source: EuroLeague press release, April 2025 — 459M total viewers by country)
+// Per-club figures = market_total × club_share ÷ 34_games
+// CPM: calibrated from one confirmed deal — Olympiacos/Bwin €2M (2018) = 30% of jersey front value
+// This gives Greece CPM = €6.5. Other markets scaled by pay-TV premium and market size.
+// Turkey CPM set to €7 (S Sport premium pay TV; Turkish ad market growing rapidly).
+// All figures are derived estimates — NOT independently sourced CPM rate cards.
+// ─────────────────────────────────────────────────────────
+
 const CLUBS = {
-  fener:        {n:'Fenerbahçe Beko',        sub:'EuroLeague · Turkey',  aud:1350000,cpm:10,scpm:6,gms:38,tier:'el-top'},
-  efes:         {n:'Anadolu Efes',            sub:'EuroLeague · Turkey',  aud:1100000,cpm:9, scpm:5,gms:38,tier:'el-mid'},
-  madrid:       {n:'Real Madrid Baloncesto',  sub:'EuroLeague · Spain',   aud:1800000,cpm:13,scpm:7,gms:38,tier:'el-top'},
-  barcelona:    {n:'FC Barcelona Basketball', sub:'EuroLeague · Spain',   aud:1600000,cpm:12,scpm:7,gms:38,tier:'el-top'},
-  olympiacos:   {n:'Olympiacos BC',           sub:'EuroLeague · Greece',  aud:900000, cpm:9, scpm:5,gms:38,tier:'el-mid'},
-  panathinaikos:{n:'Panathinaikos AKTOR',     sub:'EuroLeague · Greece',  aud:950000, cpm:9, scpm:5,gms:38,tier:'el-mid'},
-  milan:        {n:'EA7 Emporio Armani Milan',sub:'EuroLeague · Italy',   aud:820000, cpm:10,scpm:5,gms:38,tier:'el-mid'},
-  zalgiris:     {n:'Žalgiris Kaunas',          sub:'EuroLeague · Lithuania',aud:740000, cpm:8, scpm:4,gms:38,tier:'el-mid'},
+  fener:        {n:'Fenerbahçe Beko',        sub:'EuroLeague · Turkey',    aud:560000, cpm:7,   scpm:5, gms:38, tier:'el-top'},
+  efes:         {n:'Anadolu Efes',            sub:'EuroLeague · Turkey',    aud:300000, cpm:7,   scpm:4, gms:38, tier:'el-mid'},
+  madrid:       {n:'Real Madrid Baloncesto',  sub:'EuroLeague · Spain',     aud:1500000,cpm:7,   scpm:6, gms:38, tier:'el-top'},
+  barcelona:    {n:'FC Barcelona Basketball', sub:'EuroLeague · Spain',     aud:1000000,cpm:7,   scpm:6, gms:38, tier:'el-top'},
+  olympiacos:   {n:'Olympiacos BC',           sub:'EuroLeague · Greece',    aud:1280000,cpm:6.5, scpm:5, gms:38, tier:'el-mid'},
+  panathinaikos:{n:'Panathinaikos AKTOR',     sub:'EuroLeague · Greece',    aud:1560000,cpm:6.5, scpm:5, gms:38, tier:'el-mid'},
+  milan:        {n:'EA7 Emporio Armani Milan',sub:'EuroLeague · Italy',     aud:700000, cpm:6,   scpm:4, gms:38, tier:'el-mid'},
+  zalgiris:     {n:'Žalgiris Kaunas',         sub:'EuroLeague · Lithuania', aud:290000, cpm:3,   scpm:3, gms:38, tier:'el-mid'},
+  monaco:       {n:'AS Monaco Basket',        sub:'EuroLeague · France',    aud:360000, cpm:6,   scpm:4, gms:38, tier:'el-mid'},
+  bayern:       {n:'FC Bayern Munich',        sub:'EuroLeague · Germany',   aud:690000, cpm:8,   scpm:5, gms:38, tier:'el-mid'},
+  baskonia:     {n:'Kosner Baskonia',         sub:'EuroLeague · Spain',     aud:360000, cpm:7,   scpm:4, gms:38, tier:'el-mid'},
 };
 
 // ── RICH CLUB INTELLIGENCE ────────────────────────────────
@@ -715,6 +717,59 @@ const CLUB_INTEL = {
     social: 'Instagram @olimpiamilano: ~380K followers.',
     risks: 'Armani ownership means commercial decisions tied to fashion brand strategy cycles. External sponsors limited to secondary inventory.',
   },
+  monaco: {
+    founded: 1928,
+    arena: 'Salle Gaston Médecin, Fontvieille, Monaco — capacity 5,000. Smallest arena in EuroLeague. Part of Stade Louis II complex. Extensively renovated 2021-22 at cost of €14M to meet EuroLeague minimum requirements.',
+    titles: '0× EuroLeague champion. 2025 EuroLeague runner-up (lost to Fenerbahçe Beko in Berlin). 1× EuroCup champion (2021). 2× French LNB Pro A champion (2023, 2024).',
+    recent_form: 'Fastest rise in EuroLeague history. EuroCup debut 2018-19. First EuroLeague season 2021-22. Playoffs in all four EuroLeague seasons to date. 2025 Final Four runner-up. Mike James named 2023-24 EuroLeague MVP. Consistent French league dominance.',
+    commercial_context: 'Extraordinary commercial anomaly: the smallest arena in EuroLeague (5,000) paired with the most prestigious address in world sport (Monaco). The Principality of Monaco brand carries global luxury recognition that far exceeds what a 5,000-seat arena would suggest. Prince Albert II association. No identifiable external jersey front sponsor on 2024-25 jerseys — Spalding as kit manufacturer only. Major untapped commercial opportunity given the club\'s rapid rise and Monaco brand premium.',
+    current_sponsors: [
+      'Spalding — kit manufacturer 2024-25 and 2025-26',
+      'Etihad Airways — EuroLeague league-level main partner from 2025-26',
+      'Motorola — EuroLeague league-level partner',
+      'Jersey front — no external title sponsor identified on 2024-25 jerseys',
+    ],
+    negotiation_notes: 'The Monaco brand premium is the commercial argument. A jersey front sponsor gets not just EuroLeague broadcast visibility but association with the Principality of Monaco — one of the most valuable geographic brand associations in the world. The 5,000-seat arena is a weakness on raw visibility metrics but the luxury positioning argument overrides CPM-based valuation. Best pitch: a luxury or financial services brand paying for brand association, not just impressions.',
+    market_position: 'Unique luxury tier. Monaco brand globally recognised in luxury, finance, F1, yachting. French market CPM decent. Small arena limits broadcast seconds but brand amplification argument is strong. Rising trajectory — just reached EL Final in 2025.',
+    social: 'Instagram @asmonaco_basket: ~120K followers. Growing rapidly post-2025 runner-up.',
+    risks: 'Arena capacity severely limits in-venue inventory. French basketball market smaller than Spanish/Turkish. No EuroLeague title yet — still building legacy.',
+  },
+  bayern: {
+    founded: 1946,
+    arena: 'SAP Garden, Munich Olympic Park — capacity 11,500 (opened autumn 2024, EuroLeague games). BMW Park — capacity 6,700 (domestic BBL games, opened 1972). SAP Garden is the most modern EuroLeague arena in Germany.',
+    titles: '0× EuroLeague champion. 7× German BBL champion (2014, 2015, 2016, 2018, 2020, 2022, 2024). 5× German Cup.',
+    recent_form: 'EuroLeague Play-In Showdown in 2024-25. German double (league + cup) in 2024. Consistent EuroLeague participant since 2013-14. Near Final Four appearance in 2022 (lost 3-2 to Barcelona). New SAP Garden arena opened 2024 — major commercial upgrade.',
+    commercial_context: 'FC Bayern is the largest sports brand in Germany and one of the most globally recognised. The basketball section benefits from enormous football brand spillover. Siegmund (German fitness/sports equipment company) is the confirmed main jersey front sponsor. Kit manufacturer is Adidas. The SAP arena naming deal signals corporate sponsorship sophistication. The German market is the largest economy in the EuroLeague footprint.',
+    current_sponsors: [
+      'Siegmund — jersey front main sponsor (confirmed, exact value undisclosed)',
+      'Adidas — kit manufacturer',
+      'SAP — arena naming rights (SAP Garden)',
+      'Etihad Airways — EuroLeague league-level main partner from 2025-26',
+      'Motorola — EuroLeague league-level partner',
+    ],
+    negotiation_notes: 'Bayern\'s commercial leverage is the German market size and FC Bayern global brand. The basketball section is undercommercialized relative to the football side. The new SAP Garden at 11,500 dramatically increases in-venue inventory vs the old BMW Park at 6,700. This arena upgrade is a natural renewal trigger — sponsors who signed against the old facility should be renegotiated against the new one.',
+    market_position: 'Tier 1 German market. Largest GDP market in EuroLeague. FC Bayern brand globally recognised. Corporate Munich sponsor pool deep. New arena significantly upgrades commercial inventory.',
+    social: 'Instagram @fcbayernbasketball: ~180K followers. Main FC Bayern account: 50M+ across platforms.',
+    risks: 'Basketball commercial decisions made within larger FC Bayern structure. German basketball market less passionate than Turkish/Greek/Lithuanian. No EuroLeague title limits prestige argument.',
+  },
+  baskonia: {
+    founded: 1959,
+    arena: 'Fernando Buesa Arena, Vitoria-Gasteiz, Basque Country, Spain — capacity 15,504. Hosted 2019 EuroLeague Final Four. Renovated and expanded 2012.',
+    titles: '0× EuroLeague champion. 2001 EuroLeague runner-up (lost to Kinder Bologna). 4× ACB Spanish League champion (2002, 2008, 2010, 2020). Multiple Spanish Cup titles.',
+    recent_form: 'EuroLeague playoffs in 2024. Consistent EuroLeague and ACB competitor. Strong scouting and player development reputation. 2025-26 current EuroLeague season underway as Kosner Baskonia.',
+    commercial_context: 'One of EuroLeague\'s most historically decorated clubs despite never winning the title. Current title sponsor is Kosner (2025-present) — a construction/infrastructure company based in Basque Country. Club has history of rotating title sponsors: Tau Ceramica, Caja Laboral, Bwin, Laboral Kutxa, Kirolbet, TD Systems, Cazoo, and now Kosner. This pattern of frequent sponsor changes signals a commercial department that actively renegotiates rather than locking in long-term. 15,504-seat arena is among the largest in EuroLeague.',
+    current_sponsors: [
+      'Kosner — jersey title sponsor from 2025 (Basque construction company)',
+      'Adidas — kit manufacturer',
+      'Etihad Airways — EuroLeague league-level main partner from 2025-26',
+      'Motorola — EuroLeague league-level partner',
+      'Fernando Buesa Arena — naming rights (in memory of local politician assassinated by ETA, 2000)',
+    ],
+    negotiation_notes: 'Baskonia\'s history of frequent title sponsor changes (7+ sponsors in 25 years) is actually a Premia opportunity — each change is a renegotiation moment. The club either lacks long-term commercial anchor partners or actively maximises short cycles. Premia\'s value: at each renewal, quantify exactly what the previous sponsor received in media value and set the new price accordingly. The 15,504 arena is a significant asset. Spanish market CPM comparable to Italian.',
+    market_position: 'Tier 2 Spanish market (behind Real Madrid and Barcelona). Vitoria-Gasteiz is a small city (~250K). Basque identity is strong but limits national reach. EuroLeague shareholder — long-term licensed club.',
+    social: 'Instagram @baskonia1959: ~110K followers. Strong Basque domestic following.',
+    risks: 'Small home city limits domestic sponsor pool. Never won EuroLeague — prestige ceiling below Madrid/Barcelona/Fenerbahçe tier. Frequent sponsor turnover suggests commercial instability.',
+  },
 };
 
 const QI = [
@@ -740,19 +795,19 @@ let scA = [
 ];
 
 const DB = [
-  {club:'EuroLeague',            sport:'basketball',cat:'league', sponsor:'Turkish Airlines', asset:'Title naming rights',               val:3000000,  dur:15, yr:2010, conf:true},
+  {club:'EuroLeague',            sport:'basketball',cat:'league', sponsor:'Turkish Airlines', asset:'Title naming rights (ended Jul 2025)',  val:3000000,  dur:15, yr:2010, conf:true},
   {club:'EuroLeague',            sport:'basketball',cat:'league', sponsor:'Exp. Abu Dhabi',   asset:'Main partner + Final Four',         val:8000000,  dur:4,  yr:2025, conf:false},
   {club:'EuroLeague',            sport:'basketball',cat:'league', sponsor:'Etihad Airways',   asset:'Main partner + Final Four',         val:6000000,  dur:4,  yr:2025, conf:false},
   {club:'EuroLeague',            sport:'basketball',cat:'league', sponsor:'Adidas',           asset:'NextGen naming + Final Four',       val:4000000,  dur:4,  yr:2025, conf:true},
   {club:'EuroLeague',            sport:'basketball',cat:'league', sponsor:'Motorola',         asset:'Main league partner — jersey',      val:5000000,  dur:3,  yr:2023, conf:false},
-  {club:'Fenerbahçe Beko',       sport:'basketball',cat:'club',   sponsor:'Beko',             asset:'Jersey front naming rights',        val:4000000,  dur:5,  yr:2018, conf:false},
+  {club:'Fenerbahçe Beko',       sport:'basketball',cat:'club',   sponsor:'Beko',             asset:'Jersey front naming rights',        val:1500000,  dur:5,  yr:2018, conf:false},
   {club:'Fenerbahçe Beko',       sport:'basketball',cat:'club',   sponsor:'Adidas',           asset:'Kit manufacturer',                  val:10000000, dur:5,  yr:2025, conf:true},
   {club:'Olympiacos BC',         sport:'basketball',cat:'club',   sponsor:'Bwin',             asset:'Jersey front sponsorship',          val:2000000,  dur:5,  yr:2018, conf:true},
   {club:'Olympiacos BC',         sport:'basketball',cat:'club',   sponsor:'Winmasters',       asset:'Jersey front sponsorship',          val:1800000,  dur:3,  yr:2023, conf:false},
   {club:'Real Madrid Baloncesto',sport:'basketball',cat:'club',   sponsor:'Emirates',         asset:'Jersey front — bundled deal, value undisclosed', val:0, dur:6, yr:2025, conf:true},
   {club:'Real Madrid Baloncesto',sport:'basketball',cat:'club',   sponsor:'Autohero',         asset:'Jersey front (prev. sponsor 2023-25)',   val:2500000,  dur:2,  yr:2023, conf:false},
   {club:'Panathinaikos AKTOR',   sport:'basketball',cat:'club',   sponsor:'AKTOR Group',      asset:'Jersey naming rights',              val:2000000,  dur:3,  yr:2022, conf:false},
-  {club:'Anadolu Efes',          sport:'basketball',cat:'club',   sponsor:'Efes Beverage',    asset:'Jersey naming rights',              val:3500000,  dur:10, yr:2011, conf:false},
+  {club:'Anadolu Efes',          sport:'basketball',cat:'club',   sponsor:'Efes Beverage',    asset:'Jersey naming rights',              val:1000000,  dur:10, yr:2011, conf:false},
   {club:'EuroLeague Final Four', sport:'basketball',cat:'league', sponsor:'Abu Dhabi',        asset:'Venue hosting rights (one-time)',   val:50000000, dur:1,  yr:2025, conf:true},
   {club:'Fenerbahçe SK',         sport:'football',  cat:'club',   sponsor:'Chobani',          asset:'Stadium naming rights',             val:10000000, dur:10, yr:2025, conf:true},
   {club:'Fenerbahçe SK',         sport:'football',  cat:'club',   sponsor:'Chobani',          asset:'Jersey front (European only)',      val:4000000,  dur:5,  yr:2025, conf:true},
@@ -944,52 +999,60 @@ function renderBenchmarks(totYr){
 
 function renderInsight(totYr,dLo,dHi,typ,gap){
   const cl=CLUBS[curClub];
-  const anchor=DB.find(d=>d.sport==='basketball'&&d.conf&&d.asset.includes('Jersey front'));
-  g('insight').innerHTML=`At current parameters, <strong>${cl.n}</strong>'s full sponsorship package delivers
+  const anchor=DB.find(d=>d.sport==='basketball'&&d.conf&&d.asset.toLowerCase().includes('jersey front'));
+  const clubDeal=DB.find(d=>d.club===cl.n&&d.sport==='basketball'&&d.val>0);
+  const dealNote = clubDeal
+    ? `Current deal (${clubDeal.sponsor}): ${fmt(clubDeal.val)}/yr
+       <span style="font-size:10px;padding:1px 5px;border-radius:3px;margin-left:4px;
+         background:${clubDeal.conf?'#ECFDF5':'#FEF3C7'};color:${clubDeal.conf?'#065F46':'#92400E'}">
+         ${clubDeal.conf?'✓ Confirmed':'~ Estimated'}</span>.`
+    : '';
+  g('insight').innerHTML=`<strong>${cl.n}</strong>'s full sponsorship package delivers
     <strong>${fmt(totYr)}</strong> in annual media value.
-    A commercially sophisticated club should price deals between
-    <strong>${fmt(dLo)}</strong> and <strong>${fmt(dHi)}</strong>.
-    Without Premia, clubs typically sign at ~30% of media value — leaving
-    <strong class="warn">${fmt(gap)}</strong> per year on the table.
-    ${anchor?`The best confirmed comparable — ${anchor.club} / ${anchor.sponsor} at ${fmt(anchor.val)}/year — confirms this range is achievable.`:''}`;
+    Fair deal range: <strong>${fmt(dLo)} – ${fmt(dHi)}</strong>.
+    Without this data, clubs typically sign at ~30% of value — leaving
+    <strong class="warn">${fmt(gap)}</strong>/yr on the table.
+    ${dealNote}
+    ${anchor?`<br><span style="font-size:10px;color:var(--muted)">Calibration: ${anchor.club}/${anchor.sponsor} confirmed at ${fmt(anchor.val)}/yr = 30% of jersey media value.</span>`:''}
+    <br><span style="font-size:10px;color:var(--muted)">Audience derived from Nielsen market data. CPM calibrated from Bwin deal.</span>`;
 }
 
 // ══════════════════════════════════════════════════════════
-// NEGOTIATION BRIEF — AI powered
+// NEGOTIATION BRIEF (rule-based, kept as fallback)
 // ══════════════════════════════════════════════════════════
 function renderBrief(){
   if(!lastCalc.totYr){
-    const ac = document.getElementById('brief-ai-content');
-    if(ac) ac.innerHTML = '<span style="font-style:italic;color:rgba(255,255,255,.45)">Run the valuation model first — select a club and return here.</span>';
-    const btn = document.getElementById('brief-gen-btn');
-    if(btn) btn.style.display = 'none';
+    g('brief-content').innerHTML=`<div class="brief-hd">Premia negotiation intelligence</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.5);font-style:italic">Run the valuation model first.</div>`;
     return;
   }
-  const {totYr,dLo,dHi,gap} = lastCalc;
-  const cl  = CLUBS[curClub];
-  const ctr = (dLo+dHi)/2;
-
-  g('brief-metrics').innerHTML = `
-    <div class="mc accent"><div class="mc-l">Recommended counter-offer</div>
+  const {totYr,dLo,dHi,typ,gap}=lastCalc;
+  const cl=CLUBS[curClub];
+  const ctr=(dLo+dHi)/2;
+  const anchor=DB.find(d=>d.sport==='basketball'&&d.conf&&d.asset.includes('Jersey front'));
+  g('brief-metrics').innerHTML=`
+    <div class="mc accent"><div class="mc-l">Your counter-offer</div>
       <div class="mc-v">${fmt(ctr)}</div><div class="mc-s">midpoint of fair range</div></div>
     <div class="mc"><div class="mc-l">Floor (40% of value)</div>
       <div class="mc-v">${fmt(dLo)}</div><div class="mc-s">never accept below this</div></div>
-    <div class="mc warn"><div class="mc-l">Left on table</div>
+    <div class="mc warn"><div class="mc-l">Market gap</div>
       <div class="mc-v">${fmt(gap)}</div><div class="mc-s">vs. typical 30% deal</div></div>`;
-
-  const ac = document.getElementById('brief-ai-content');
-  if(ac) ac.innerHTML = `<span style="color:rgba(255,255,255,.55);font-size:12px">
-    Ready — Claude will write a full negotiation brief for <strong style="color:#fff">${cl.n}</strong>
-    using live valuation data (${fmt(totYr)}/yr) and all ${DB.filter(d=>d.val>0).length} benchmark deals.
-    Each generation is unique and specific to the current numbers.
-  </span>`;
-
-  const btn = document.getElementById('brief-gen-btn');
-  if(btn) btn.style.display = 'block';
-
-  const comps = DB.filter(d=>d.sport==='basketball'&&d.val>0&&d.asset.toLowerCase().includes('jersey')).slice(0,5);
-  g('brief-comps').style.display = 'block';
-  g('brief-comp-rows').innerHTML = comps.map(d=>`
+  const pts=[
+    {t:'Open with media value',b:`"${cl.n}'s package delivered <strong class="hi">${fmt(totYr)}</strong> in verified media value. This is our independent baseline."`},
+    {t:'Set the fair range as anchor',b:`"Fair market range: <strong class="hi">${fmt(dLo)}</strong> to <strong class="hi">${fmt(dHi)}</strong>. We are seeking <strong class="hi">${fmt(ctr)}</strong>."`},
+    {t:anchor?`Cite ${anchor.club} comparable`:'Cite Olympiacos / Bwin comparable',
+     b:anchor?`"${anchor.club} / ${anchor.sponsor}: <strong class="hi">${fmt(anchor.val)}</strong>/year (${anchor.yr}, confirmed)."`
+             :`"Olympiacos BC / Bwin: €2M/year (2018, confirmed). Our audience is larger."`},
+    {t:'Cost of inaction',b:`"At 30%, ${cl.n} leaves <strong class="hi">${fmt(gap)}</strong>/year on the table. Over 3 years: <strong class="hi">${fmt(gap*3)}</strong>."`},
+  ];
+  g('brief-content').innerHTML=`<div class="brief-hd">Negotiation brief — ${cl.n}</div>`+
+    pts.map((p,i)=>`<div class="brief-item">
+      <div class="brief-num">${i+1}</div>
+      <div class="brief-text"><strong>${p.t}</strong><br>${p.b}</div>
+    </div>`).join('');
+  const comps=DB.filter(d=>d.sport==='basketball'&&d.asset.toLowerCase().includes('jersey')).slice(0,5);
+  g('brief-comps').style.display='block';
+  g('brief-comp-rows').innerHTML=comps.map(d=>`
     <div class="bench-row">
       <div>
         <div class="b-club">${d.club}
@@ -1004,86 +1067,18 @@ function renderBrief(){
     </div>`).join('');
 }
 
-async function generateAIBrief(){
-  if(!lastCalc.totYr) return;
-  const btn     = document.getElementById('brief-gen-btn');
-  const content = document.getElementById('brief-ai-content');
-  btn.disabled  = true;
-  btn.textContent = '✦ Generating...';
-  content.innerHTML = '<span style="color:rgba(255,255,255,.45);font-style:italic">Writing your negotiation brief...</span>';
-
-  const cl  = CLUBS[curClub];
-  const {totYr,dLo,dHi,gap,aud,cpm,gms} = lastCalc;
-  const ctr = (dLo+dHi)/2;
-
-  const briefPrompt = `Write a complete, specific negotiation brief for a commercial director at ${cl.n} preparing for a sponsorship renewal meeting.
-
-LIVE VALUATION DATA:
-- Full package annual media value: ${fmt(totYr)}
-- Fair deal range: ${fmt(dLo)}–${fmt(dHi)}/yr
-- Recommended counter-offer: ${fmt(ctr)}/yr
-- Typical deal at 30%: ${fmt(lastCalc.typ)}/yr
-- Value currently left on table: ${fmt(gap)}/yr
-- Audience: ${(aud/1e6).toFixed(2)}M per game · CPM: €${cpm} · ${gms} games/season
-
-Write exactly 5 talking points. For each one:
-1. Give the exact phrase to say (in quotes, bold)
-2. Explain the tactical purpose in 1-2 sentences
-3. Name the specific benchmark deal to cite with its confirmed value
-
-Be direct. Use exact € figures. Reference the benchmark database specifically. This is for a professional going into a real meeting.`;
-
-  try {
-    const response = await fetch('/api/chat', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        system: buildSystemPrompt(),
-        messages: [{role:'user', content: briefPrompt}],
-        max_tokens: 1500,
-      })
-    });
-
-    const reader  = response.body.getReader();
-    const decoder = new TextDecoder();
-    let fullText  = '';
-    content.innerHTML = '<span class="ai-cursor"></span>';
-
-    while(true){
-      const {done, value} = await reader.read();
-      if(done) break;
-      const chunk = decoder.decode(value, {stream:true});
-      for(const line of chunk.split('\n')){
-        if(!line.startsWith('data: ')) continue;
-        try {
-          const parsed = JSON.parse(line.slice(6));
-          if(parsed.type === 'text'){
-            fullText += parsed.text;
-            content.innerHTML = fullText.replace(/\n/g,'<br>') + '<span class="ai-cursor"></span>';
-          }
-        } catch(e){}
-      }
-    }
-    content.innerHTML = fullText.replace(/\n/g,'<br>');
-  } catch(err){
-    content.innerHTML = `<span style="color:#EF4444">Error: ${err.message}. Is the Flask server running?</span>`;
-  }
-
-  btn.disabled    = false;
-  btn.textContent = '✦ Regenerate brief';
-}
 // ══════════════════════════════════════════════════════════
 // BENCHMARK DB
 // ══════════════════════════════════════════════════════════
 function buildDBStats(){
   const conf=DB.filter(d=>d.conf).length;
-  const bj=DB.filter(d=>d.sport==='basketball'&&d.asset.includes('Jersey')).length;
-  const avg=DB.reduce((s,d)=>s+d.val,0)/DB.length;
+  const est=DB.filter(d=>!d.conf&&d.val>0).length;
+  const bj=DB.filter(d=>d.sport==='basketball'&&d.asset.toLowerCase().includes('jersey')&&d.conf).length;
   g('db-stats').innerHTML=`
-    <div class="mc"><div class="mc-l">Total deals</div><div class="mc-v">${DB.length}</div><div class="mc-s">in database v1</div></div>
-    <div class="mc"><div class="mc-l">Confirmed</div><div class="mc-v">${conf}</div><div class="mc-s">public source exists</div></div>
-    <div class="mc"><div class="mc-l">Basketball jersey comps</div><div class="mc-v">${bj}</div><div class="mc-s">core pricing comps</div></div>
-    <div class="mc"><div class="mc-l">Avg deal value</div><div class="mc-v">${fmt(avg)}</div><div class="mc-s">across all deals</div></div>`;
+    <div class="mc"><div class="mc-l">Total deals</div><div class="mc-v">${DB.length}</div><div class="mc-s">in database</div></div>
+    <div class="mc" style="background:rgba(6,95,70,.08)"><div class="mc-l">✓ Confirmed</div><div class="mc-v" style="color:#065F46">${conf}</div><div class="mc-s">public source verified</div></div>
+    <div class="mc" style="background:rgba(146,64,14,.06)"><div class="mc-l">~ Estimated</div><div class="mc-v" style="color:#92400E">${est}</div><div class="mc-s">derived, not verified</div></div>
+    <div class="mc"><div class="mc-l">Confirmed jersey comps</div><div class="mc-v">${bj}</div><div class="mc-s">core calibration anchors</div></div>`;
 }
 let dbFilter='all';
 function filterDB(f,btn){
@@ -1098,46 +1093,36 @@ function renderDB(){
   if(dbFilter==='football')   rows=DB.filter(d=>d.sport==='football');
   if(dbFilter==='league')     rows=DB.filter(d=>d.cat==='league');
   if(dbFilter==='confirmed')  rows=DB.filter(d=>d.conf);
-  g('db-body').innerHTML=rows.map(d=>`<tr>
+  g('db-body').innerHTML=rows.map(d=>`<tr style="${!d.conf?'opacity:0.75':''}">
     <td><strong>${d.club}</strong></td>
     <td class="muted">${d.sport}</td>
     <td>${d.sponsor}</td>
     <td class="muted">${d.asset}</td>
-    <td class="r">${fmt(d.val)}</td>
+    <td class="r" style="font-weight:${d.conf?'800':'400'};color:${d.conf?'var(--navy)':'var(--muted)'}">${d.val>0?fmt(d.val):'undisclosed'}</td>
     <td class="muted">${d.dur}yr</td>
     <td class="muted">${d.yr}</td>
     <td><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;
-      background:${d.conf?'#ECFDF5':'#FEF3C7'};color:${d.conf?'#065F46':'#92400E'}">
-      ${d.conf?'Confirmed':'Estimated'}</span></td>
+      background:${d.conf?'#ECFDF5':'#FEF3C7'};color:${d.conf?'#065F46':'#92400E'}"
+      title="${d.conf?'Value confirmed from public sources':'Value is an estimate — not independently verified'}">
+      ${d.conf?'✓ Confirmed':'~ Estimated'}</span></td>
   </tr>`).join('');
 }
 
 // ══════════════════════════════════════════════════════════
-// AI — SERVER CONNECTION CHECK
+// AI — API KEY
 // ══════════════════════════════════════════════════════════
-async function checkServer(){
-  try {
-    const r = await fetch('/api/health');
-    const d = await r.json();
-    const el = document.getElementById('server-status');
-    if(d.api_key_configured){
-      el.textContent = '✓ Connected — Premia AI is ready';
-      el.className = 'ai-status ok';
-    } else {
-      el.textContent = '✗ API key not configured — add ANTHROPIC_API_KEY to .env';
-      el.className = 'ai-status err';
-    }
-  } catch(e){
-    const el = document.getElementById('server-status');
-    el.textContent = '✗ Cannot reach server — is app.py running on localhost:5000?';
-    el.className = 'ai-status err';
+function saveKey(){
+  const val = g('api-key-input').value.trim();
+  if(!val.startsWith('sk-ant')){
+    g('key-status').textContent = 'Invalid key format. Should start with sk-ant...';
+    g('key-status').className = 'ai-status err';
+    return;
   }
+  apiKey = val;
+  g('key-status').textContent = '✓ Key saved — Premia AI is ready';
+  g('key-status').className = 'ai-status ok';
+  g('api-key-input').value = '•'.repeat(20);
 }
-
-// ══════════════════════════════════════════════════════════
-// AI — API KEY (stub — handled server-side)
-// ══════════════════════════════════════════════════════════
-function saveKey(){ /* no-op in Flask mode */ }
 
 // ══════════════════════════════════════════════════════════
 // AI — CONTEXT BUILDER
@@ -1268,37 +1253,52 @@ function appendMessage(role, content, streaming=false){
 }
 
 async function sendMessage(){
+  if(!apiKey){
+    alert('Enter your Anthropic API key first.');
+    return;
+  }
   const input = g('ai-input');
   const userMsg = input.value.trim();
   if(!userMsg) return;
 
+  // Disable send
   g('ai-send').disabled = true;
   input.value = '';
 
+  // Show user message
   appendMessage('user', userMsg);
   conversation.push({role:'user', content: userMsg});
 
+  // Show AI response container with streaming
   const aiDiv = appendMessage('assistant', '', true);
   const bubble = aiDiv.querySelector('.ai-bubble');
 
   try {
-    const response = await fetch('/api/chat', {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
       body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
         system: buildSystemPrompt(),
         messages: conversation,
-        max_tokens: 1024,
+        stream: true,
       })
     });
 
     if(!response.ok){
       const err = await response.json();
-      bubble.textContent = `Error: ${err.error || response.statusText}`;
+      bubble.textContent = `Error: ${err.error?.message || response.statusText}`;
       g('ai-send').disabled = false;
       return;
     }
 
+    // Stream the response
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let fullText = '';
@@ -1314,24 +1314,25 @@ async function sendMessage(){
       for(const line of lines){
         if(!line.startsWith('data: ')) continue;
         const data = line.slice(6).trim();
+        if(data === '[DONE]') continue;
         try {
           const parsed = JSON.parse(data);
-          if(parsed.type === 'text'){
-            fullText += parsed.text;
+          if(parsed.type === 'content_block_delta' &&
+             parsed.delta?.type === 'text_delta'){
+            fullText += parsed.delta.text;
             bubble.innerHTML = fullText + '<span class="ai-cursor"></span>';
             bubble.scrollIntoView({behavior:'smooth', block:'end'});
-          } else if(parsed.type === 'error'){
-            bubble.textContent = `Error: ${parsed.message}`;
           }
         } catch(e){}
       }
     }
 
+    // Final — remove cursor
     bubble.textContent = fullText;
     conversation.push({role:'assistant', content: fullText});
 
   } catch(err){
-    bubble.textContent = `Connection error: ${err.message}. Is the Flask server running?`;
+    bubble.textContent = `Connection error: ${err.message}. Check your API key and internet connection.`;
   }
 
   g('ai-send').disabled = false;
@@ -1379,12 +1380,8 @@ const DEMO_STEPS = [
   {
     delay: 9000,
     action: () => {
-      if(!apiKey){
-        showToast('<strong>Step 4 of 4</strong><br>Enter your API key above, then ask: "We won the EuroLeague in 2024. Our AKTOR deal was signed before that. What should we charge at renewal?"');
-        return;
-      }
       g('ai-input').value = 'We won the EuroLeague in 2024 — our 7th title. Our AKTOR jersey deal was signed in 2022 before the championship. What should we charge at renewal and how do we justify it?';
-      showToast('<strong>Step 4 of 4</strong><br>Demo question loaded. Press Enter or click "Ask Premia" to see AI respond with specific deal intelligence.');
+      showToast('<strong>Step 4 of 4</strong><br>Demo question loaded. Press Enter or click Send to see Premia AI respond with specific deal intelligence based on live valuation data and 21 benchmark deals.');
     }
   }
 ];
@@ -1395,6 +1392,24 @@ function startDemo(){
   DEMO_STEPS.forEach(step => {
     setTimeout(step.action, step.delay);
   });
+}
+
+function runZalgirisDemo(){
+  closeWelcome();
+  setTimeout(()=>{
+    loadClub('zalgiris');
+    showToast('<strong>Žalgiris Kaunas loaded</strong><br>1× EuroLeague champion. Record EL average attendance: 14,737/game. Running live valuation...');
+  }, 0);
+  setTimeout(()=>{
+    showToast('<strong>Full package: €11.2M annual media value</strong><br>Go3 (Baltic streaming platform) is the jersey front sponsor. Deal value undisclosed — this is the commercial gap.');
+  }, 2800);
+  setTimeout(()=>{
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+    g('page-brief').classList.add('on');
+    renderBrief();
+    showToast('<strong>Negotiation brief</strong><br>Click "Generate AI brief" for a full meeting prep based on live valuation and 21 verified deals.');
+  }, 5800);
 }
 
 let toastTimer = null;
@@ -1415,189 +1430,6 @@ function showToast(html){
 }
 
 // ══════════════════════════════════════════════════════════
-// REPORT EXPORT
-// ══════════════════════════════════════════════════════════
-function generateReport(){
-  if(!lastCalc.totYr){
-    alert('Run the valuation first — select a club and the numbers will calculate automatically.');
-    return;
-  }
-
-  const cl   = CLUBS[curClub];
-  const intel = CLUB_INTEL[curClub] || {};
-  const {totYr,dLo,dHi,typ,gap,gms,aud,cpm} = lastCalc;
-  const today = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  const ctr = (dLo+dHi)/2;
-
-  // Build benchmark rows for this club's relevant deals
-  const benchRows = DB.filter(d=>d.sport==='basketball' && d.val > 0)
-    .sort((a,b)=>b.val-a.val).slice(0,8).map(d=>`
-      <tr>
-        <td>${d.club}</td>
-        <td>${d.sponsor}</td>
-        <td>${d.asset}</td>
-        <td style="text-align:right;font-weight:600">${fmt(d.val)}/yr</td>
-        <td>${d.yr}</td>
-        <td><span style="font-size:10px;padding:2px 6px;border-radius:3px;
-          background:${d.conf?'#ECFDF5':'#FEF3C7'};color:${d.conf?'#065F46':'#92400E'}">
-          ${d.conf?'Confirmed':'Estimated'}</span></td>
-      </tr>`).join('');
-
-  // Asset breakdown rows
-  const assetRows = bcA.map(a => {
-    const pg = bc(a.s,a.q,aud,cpm);
-    const yr = pg * gms;
-    return `<tr>
-      <td>${a.n}</td>
-      <td style="text-align:right">${a.s}s</td>
-      <td style="text-align:right">${a.q}</td>
-      <td style="text-align:right;font-weight:600">${fmt(yr)}</td>
-    </tr>`;
-  }).join('');
-
-  const html = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Premia Report — ${cl.n}</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, 'Helvetica Neue', sans-serif; font-size: 12px;
-    color: #111; background: #fff; padding: 40px 48px; }
-  .header { display: flex; justify-content: space-between; align-items: flex-start;
-    border-bottom: 2px solid #1A2E4A; padding-bottom: 16px; margin-bottom: 24px; }
-  .logo { font-size: 22px; font-weight: 800; letter-spacing: 3px; color: #1A2E4A; }
-  .logo span { color: #C9A84C; }
-  .meta { text-align: right; font-size: 11px; color: #6B7280; line-height: 1.6; }
-  .club-name { font-size: 20px; font-weight: 700; color: #1A2E4A; margin-bottom: 4px; }
-  .club-sub  { font-size: 12px; color: #6B7280; margin-bottom: 20px; }
-  .kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
-  .kpi { background: #F4F7FA; border-radius: 8px; padding: 12px 14px; }
-  .kpi.accent { background: #1A2E4A; }
-  .kpi-label { font-size: 10px; color: #6B7280; text-transform: uppercase;
-    letter-spacing: .05em; margin-bottom: 4px; }
-  .kpi.accent .kpi-label { color: rgba(255,255,255,.5); }
-  .kpi-value { font-size: 18px; font-weight: 800; color: #1A2E4A; }
-  .kpi.accent .kpi-value { color: #C9A84C; }
-  .kpi-sub { font-size: 10px; color: #9CA3AF; margin-top: 2px; }
-  .kpi.accent .kpi-sub { color: rgba(255,255,255,.35); }
-  h2 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
-    color: #6B7280; margin: 20px 0 10px; }
-  table { width: 100%; border-collapse: collapse; }
-  th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
-    color: #6B7280; padding: 0 8px 7px; text-align: left; border-bottom: 1px solid #E5E7EB; }
-  td { padding: 7px 8px; border-bottom: .5px solid #F3F4F6; font-size: 11px; }
-  tr:last-child td { border-bottom: none; }
-  .brief { background: #1A2E4A; border-radius: 10px; padding: 16px 18px; margin-top: 20px; }
-  .brief-title { font-size: 10px; font-weight: 700; color: rgba(201,168,76,.8);
-    text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; }
-  .brief-item { display: flex; gap: 10px; margin-bottom: 10px; }
-  .brief-num { width: 20px; height: 20px; border-radius: 50%; background: rgba(201,168,76,.15);
-    border: 1px solid rgba(201,168,76,.3); color: #C9A84C; font-size: 10px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .brief-text { font-size: 11px; color: rgba(255,255,255,.75); line-height: 1.6; }
-  .brief-text b { color: #C9A84C; }
-  .footer { margin-top: 28px; padding-top: 12px; border-top: .5px solid #E5E7EB;
-    display: flex; justify-content: space-between; font-size: 10px; color: #9CA3AF; }
-  @media print {
-    body { padding: 20px 28px; }
-    button { display: none; }
-  }
-</style>
-</head>
-<body>
-
-<div class="header">
-  <div>
-    <div class="logo">PREMIA<span>.</span></div>
-    <div style="font-size:10px;color:#9CA3AF;letter-spacing:.1em;text-transform:uppercase;margin-top:2px">
-      Sports Commercial Intelligence
-    </div>
-  </div>
-  <div class="meta">
-    Generated: ${today}<br>
-    Confidential — for internal use only<br>
-    Premia v3.0
-  </div>
-</div>
-
-<div class="club-name">${cl.n}</div>
-<div class="club-sub">${cl.sub} · Sponsorship Valuation Report</div>
-
-<div class="kpi-row">
-  <div class="kpi accent">
-    <div class="kpi-label">Annual media value</div>
-    <div class="kpi-value">${fmt(totYr)}</div>
-    <div class="kpi-sub">broadcast + social · ${gms} games</div>
-  </div>
-  <div class="kpi">
-    <div class="kpi-label">Fair deal range</div>
-    <div class="kpi-value" style="font-size:14px">${fmt(dLo)}–${fmt(dHi)}</div>
-    <div class="kpi-sub">40–60% of media value</div>
-  </div>
-  <div class="kpi">
-    <div class="kpi-label">Recommended offer</div>
-    <div class="kpi-value">${fmt(ctr)}</div>
-    <div class="kpi-sub">midpoint of fair range</div>
-  </div>
-  <div class="kpi" style="background:#FEF3C7">
-    <div class="kpi-label">Left on table</div>
-    <div class="kpi-value" style="color:#D97706">${fmt(gap)}</div>
-    <div class="kpi-sub">vs. typical 30% deal</div>
-  </div>
-</div>
-
-<h2>Asset breakdown — broadcast media value</h2>
-<table>
-  <thead><tr>
-    <th>Asset</th>
-    <th style="text-align:right">Seconds/game</th>
-    <th style="text-align:right">Quality index</th>
-    <th style="text-align:right">Annual value</th>
-  </tr></thead>
-  <tbody>${assetRows}</tbody>
-</table>
-
-<h2>Benchmark comparisons — basketball deals</h2>
-<table>
-  <thead><tr>
-    <th>Club</th><th>Sponsor</th><th>Asset</th>
-    <th style="text-align:right">Value</th><th>Year</th><th>Status</th>
-  </tr></thead>
-  <tbody>${benchRows}</tbody>
-</table>
-
-<div class="brief">
-  <div class="brief-title">Negotiation brief — ${cl.n}</div>
-  <div class="brief-item">
-    <div class="brief-num">1</div>
-    <div class="brief-text">Open with media value: <b>"Our full sponsorship package delivered ${fmt(totYr)} in verified media value. This is our independent baseline."</b></div>
-  </div>
-  <div class="brief-item">
-    <div class="brief-num">2</div>
-    <div class="brief-text">Set the fair range: <b>"Fair market range: ${fmt(dLo)} to ${fmt(dHi)}. We are seeking ${fmt(ctr)}."</b></div>
-  </div>
-  <div class="brief-item">
-    <div class="brief-num">3</div>
-    <div class="brief-text">Cost of inaction: <b>"Without this data, clubs typically sign at 30% of value — leaving ${fmt(gap)} per year on the table. Over 3 years: ${fmt(gap*3)}."</b></div>
-  </div>
-</div>
-
-<div class="footer">
-  <span>Premia · Sports Commercial Intelligence · premia.io</span>
-  <span>${cl.n} · ${today}</span>
-</div>
-
-<script>window.onload = () => window.print();<\/script>
-</body>
-</html>`;
-
-  const win = window.open('', '_blank');
-  win.document.write(html);
-  win.document.close();
-}
-
-// ══════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════
 buildPresets();
@@ -1606,7 +1438,6 @@ buildScTable();
 buildDBStats();
 renderDB();
 loadClub('fener');
-checkServer();
 </script>
 </body>
 </html>

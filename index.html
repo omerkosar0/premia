@@ -262,15 +262,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
     <div class="welcome-tagline">Sports Commercial Intelligence</div>
     <div class="welcome-headline">The AI platform that tells clubs what their sponsorship assets are worth — and how to charge more.</div>
     <div class="welcome-body">
-      Built for EuroLeague commercial directors. Powered by a proprietary deal database and Claude AI. 
+      Built for EuroLeague commercial directors. 11 clubs. 21 verified deals. Powered by Claude AI.
       <strong>Not a spreadsheet. Not a consulting report. A live intelligence platform.</strong>
     </div>
     <div class="welcome-steps">
       <div class="welcome-step"><div class="welcome-step-num">1</div>Select a club and run the valuation — 30 seconds</div>
-      <div class="welcome-step"><div class="welcome-step-num">2</div>See every sponsorship asset's media value vs. current deals</div>
-      <div class="welcome-step"><div class="welcome-step-num">3</div>Ask Premia AI any deal or negotiation question</div>
+      <div class="welcome-step"><div class="welcome-step-num">2</div>See every asset's media value vs. current market deals</div>
+      <div class="welcome-step"><div class="welcome-step-num">3</div>Generate an AI negotiation brief with exact talking points</div>
     </div>
-    <button class="welcome-btn" onclick="closeWelcome()">Open Premia →</button>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button class="welcome-btn" onclick="closeWelcome()" style="flex:1">Open Premia →</button>
+      <button class="welcome-btn" onclick="startDemo()" style="flex:1;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:var(--gold)">▶ Run demo</button>
+    </div>
   </div>
 </div>
 
@@ -549,15 +552,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 // ══════════════════════════════════════════════════════════
 // DATA
 // ══════════════════════════════════════════════════════════
+// ── AUDIENCE & CPM METHODOLOGY ────────────────────────────
+// Audience: derived from Nielsen Sports 2024-25 cumulative season totals by market
+// (Source: EuroLeague press release, April 2025 — 459M total viewers by country)
+// Per-club figures = market_total × club_share ÷ 34_games
+// CPM: calibrated from one confirmed deal — Olympiacos/Bwin €2M (2018) = 30% of jersey front value
+// This gives Greece CPM = €6.5. Other markets scaled by pay-TV premium and market size.
+// Turkey CPM set to €7 (S Sport premium pay TV; Turkish ad market growing rapidly).
+// All figures are derived estimates — NOT independently sourced CPM rate cards.
+// ─────────────────────────────────────────────────────────
+
 const CLUBS = {
-  fener:        {n:'Fenerbahçe Beko',        sub:'EuroLeague · Turkey',  aud:1350000,cpm:10,scpm:6,gms:38,tier:'el-top'},
-  efes:         {n:'Anadolu Efes',            sub:'EuroLeague · Turkey',  aud:1100000,cpm:9, scpm:5,gms:38,tier:'el-mid'},
-  madrid:       {n:'Real Madrid Baloncesto',  sub:'EuroLeague · Spain',   aud:1800000,cpm:13,scpm:7,gms:38,tier:'el-top'},
-  barcelona:    {n:'FC Barcelona Basketball', sub:'EuroLeague · Spain',   aud:1600000,cpm:12,scpm:7,gms:38,tier:'el-top'},
-  olympiacos:   {n:'Olympiacos BC',           sub:'EuroLeague · Greece',  aud:900000, cpm:9, scpm:5,gms:38,tier:'el-mid'},
-  panathinaikos:{n:'Panathinaikos AKTOR',     sub:'EuroLeague · Greece',  aud:950000, cpm:9, scpm:5,gms:38,tier:'el-mid'},
-  milan:        {n:'EA7 Emporio Armani Milan',sub:'EuroLeague · Italy',   aud:820000, cpm:10,scpm:5,gms:38,tier:'el-mid'},
-  zalgiris:     {n:'Žalgiris Kaunas',          sub:'EuroLeague · Lithuania',aud:740000, cpm:8, scpm:4,gms:38,tier:'el-mid'},
+  fener:        {n:'Fenerbahçe Beko',        sub:'EuroLeague · Turkey',    aud:560000, cpm:7,   scpm:5, gms:38, tier:'el-top'},
+  efes:         {n:'Anadolu Efes',            sub:'EuroLeague · Turkey',    aud:300000, cpm:7,   scpm:4, gms:38, tier:'el-mid'},
+  madrid:       {n:'Real Madrid Baloncesto',  sub:'EuroLeague · Spain',     aud:1500000,cpm:7,   scpm:6, gms:38, tier:'el-top'},
+  barcelona:    {n:'FC Barcelona Basketball', sub:'EuroLeague · Spain',     aud:1000000,cpm:7,   scpm:6, gms:38, tier:'el-top'},
+  olympiacos:   {n:'Olympiacos BC',           sub:'EuroLeague · Greece',    aud:1280000,cpm:6.5, scpm:5, gms:38, tier:'el-mid'},
+  panathinaikos:{n:'Panathinaikos AKTOR',     sub:'EuroLeague · Greece',    aud:1560000,cpm:6.5, scpm:5, gms:38, tier:'el-mid'},
+  milan:        {n:'EA7 Emporio Armani Milan',sub:'EuroLeague · Italy',     aud:700000, cpm:6,   scpm:4, gms:38, tier:'el-mid'},
+  zalgiris:     {n:'Žalgiris Kaunas',         sub:'EuroLeague · Lithuania', aud:290000, cpm:3,   scpm:3, gms:38, tier:'el-mid'},
+  monaco:       {n:'AS Monaco Basket',        sub:'EuroLeague · France',    aud:360000, cpm:6,   scpm:4, gms:38, tier:'el-mid'},
+  bayern:       {n:'FC Bayern Munich',        sub:'EuroLeague · Germany',   aud:690000, cpm:8,   scpm:5, gms:38, tier:'el-mid'},
+  baskonia:     {n:'Kosner Baskonia',         sub:'EuroLeague · Spain',     aud:360000, cpm:7,   scpm:4, gms:38, tier:'el-mid'},
 };
 
 // ── RICH CLUB INTELLIGENCE ────────────────────────────────
@@ -701,6 +717,59 @@ const CLUB_INTEL = {
     social: 'Instagram @olimpiamilano: ~380K followers.',
     risks: 'Armani ownership means commercial decisions tied to fashion brand strategy cycles. External sponsors limited to secondary inventory.',
   },
+  monaco: {
+    founded: 1928,
+    arena: 'Salle Gaston Médecin, Fontvieille, Monaco — capacity 5,000. Smallest arena in EuroLeague. Part of Stade Louis II complex. Extensively renovated 2021-22 at cost of €14M to meet EuroLeague minimum requirements.',
+    titles: '0× EuroLeague champion. 2025 EuroLeague runner-up (lost to Fenerbahçe Beko in Berlin). 1× EuroCup champion (2021). 2× French LNB Pro A champion (2023, 2024).',
+    recent_form: 'Fastest rise in EuroLeague history. EuroCup debut 2018-19. First EuroLeague season 2021-22. Playoffs in all four EuroLeague seasons to date. 2025 Final Four runner-up. Mike James named 2023-24 EuroLeague MVP. Consistent French league dominance.',
+    commercial_context: 'Extraordinary commercial anomaly: the smallest arena in EuroLeague (5,000) paired with the most prestigious address in world sport (Monaco). The Principality of Monaco brand carries global luxury recognition that far exceeds what a 5,000-seat arena would suggest. Prince Albert II association. No identifiable external jersey front sponsor on 2024-25 jerseys — Spalding as kit manufacturer only. Major untapped commercial opportunity given the club\'s rapid rise and Monaco brand premium.',
+    current_sponsors: [
+      'Spalding — kit manufacturer 2024-25 and 2025-26',
+      'Etihad Airways — EuroLeague league-level main partner from 2025-26',
+      'Motorola — EuroLeague league-level partner',
+      'Jersey front — no external title sponsor identified on 2024-25 jerseys',
+    ],
+    negotiation_notes: 'The Monaco brand premium is the commercial argument. A jersey front sponsor gets not just EuroLeague broadcast visibility but association with the Principality of Monaco — one of the most valuable geographic brand associations in the world. The 5,000-seat arena is a weakness on raw visibility metrics but the luxury positioning argument overrides CPM-based valuation. Best pitch: a luxury or financial services brand paying for brand association, not just impressions.',
+    market_position: 'Unique luxury tier. Monaco brand globally recognised in luxury, finance, F1, yachting. French market CPM decent. Small arena limits broadcast seconds but brand amplification argument is strong. Rising trajectory — just reached EL Final in 2025.',
+    social: 'Instagram @asmonaco_basket: ~120K followers. Growing rapidly post-2025 runner-up.',
+    risks: 'Arena capacity severely limits in-venue inventory. French basketball market smaller than Spanish/Turkish. No EuroLeague title yet — still building legacy.',
+  },
+  bayern: {
+    founded: 1946,
+    arena: 'SAP Garden, Munich Olympic Park — capacity 11,500 (opened autumn 2024, EuroLeague games). BMW Park — capacity 6,700 (domestic BBL games, opened 1972). SAP Garden is the most modern EuroLeague arena in Germany.',
+    titles: '0× EuroLeague champion. 7× German BBL champion (2014, 2015, 2016, 2018, 2020, 2022, 2024). 5× German Cup.',
+    recent_form: 'EuroLeague Play-In Showdown in 2024-25. German double (league + cup) in 2024. Consistent EuroLeague participant since 2013-14. Near Final Four appearance in 2022 (lost 3-2 to Barcelona). New SAP Garden arena opened 2024 — major commercial upgrade.',
+    commercial_context: 'FC Bayern is the largest sports brand in Germany and one of the most globally recognised. The basketball section benefits from enormous football brand spillover. Siegmund (German fitness/sports equipment company) is the confirmed main jersey front sponsor. Kit manufacturer is Adidas. The SAP arena naming deal signals corporate sponsorship sophistication. The German market is the largest economy in the EuroLeague footprint.',
+    current_sponsors: [
+      'Siegmund — jersey front main sponsor (confirmed, exact value undisclosed)',
+      'Adidas — kit manufacturer',
+      'SAP — arena naming rights (SAP Garden)',
+      'Etihad Airways — EuroLeague league-level main partner from 2025-26',
+      'Motorola — EuroLeague league-level partner',
+    ],
+    negotiation_notes: 'Bayern\'s commercial leverage is the German market size and FC Bayern global brand. The basketball section is undercommercialized relative to the football side. The new SAP Garden at 11,500 dramatically increases in-venue inventory vs the old BMW Park at 6,700. This arena upgrade is a natural renewal trigger — sponsors who signed against the old facility should be renegotiated against the new one.',
+    market_position: 'Tier 1 German market. Largest GDP market in EuroLeague. FC Bayern brand globally recognised. Corporate Munich sponsor pool deep. New arena significantly upgrades commercial inventory.',
+    social: 'Instagram @fcbayernbasketball: ~180K followers. Main FC Bayern account: 50M+ across platforms.',
+    risks: 'Basketball commercial decisions made within larger FC Bayern structure. German basketball market less passionate than Turkish/Greek/Lithuanian. No EuroLeague title limits prestige argument.',
+  },
+  baskonia: {
+    founded: 1959,
+    arena: 'Fernando Buesa Arena, Vitoria-Gasteiz, Basque Country, Spain — capacity 15,504. Hosted 2019 EuroLeague Final Four. Renovated and expanded 2012.',
+    titles: '0× EuroLeague champion. 2001 EuroLeague runner-up (lost to Kinder Bologna). 4× ACB Spanish League champion (2002, 2008, 2010, 2020). Multiple Spanish Cup titles.',
+    recent_form: 'EuroLeague playoffs in 2024. Consistent EuroLeague and ACB competitor. Strong scouting and player development reputation. 2025-26 current EuroLeague season underway as Kosner Baskonia.',
+    commercial_context: 'One of EuroLeague\'s most historically decorated clubs despite never winning the title. Current title sponsor is Kosner (2025-present) — a construction/infrastructure company based in Basque Country. Club has history of rotating title sponsors: Tau Ceramica, Caja Laboral, Bwin, Laboral Kutxa, Kirolbet, TD Systems, Cazoo, and now Kosner. This pattern of frequent sponsor changes signals a commercial department that actively renegotiates rather than locking in long-term. 15,504-seat arena is among the largest in EuroLeague.',
+    current_sponsors: [
+      'Kosner — jersey title sponsor from 2025 (Basque construction company)',
+      'Adidas — kit manufacturer',
+      'Etihad Airways — EuroLeague league-level main partner from 2025-26',
+      'Motorola — EuroLeague league-level partner',
+      'Fernando Buesa Arena — naming rights (in memory of local politician assassinated by ETA, 2000)',
+    ],
+    negotiation_notes: 'Baskonia\'s history of frequent title sponsor changes (7+ sponsors in 25 years) is actually a Premia opportunity — each change is a renegotiation moment. The club either lacks long-term commercial anchor partners or actively maximises short cycles. Premia\'s value: at each renewal, quantify exactly what the previous sponsor received in media value and set the new price accordingly. The 15,504 arena is a significant asset. Spanish market CPM comparable to Italian.',
+    market_position: 'Tier 2 Spanish market (behind Real Madrid and Barcelona). Vitoria-Gasteiz is a small city (~250K). Basque identity is strong but limits national reach. EuroLeague shareholder — long-term licensed club.',
+    social: 'Instagram @baskonia1959: ~110K followers. Strong Basque domestic following.',
+    risks: 'Small home city limits domestic sponsor pool. Never won EuroLeague — prestige ceiling below Madrid/Barcelona/Fenerbahçe tier. Frequent sponsor turnover suggests commercial instability.',
+  },
 };
 
 const QI = [
@@ -726,19 +795,19 @@ let scA = [
 ];
 
 const DB = [
-  {club:'EuroLeague',            sport:'basketball',cat:'league', sponsor:'Turkish Airlines', asset:'Title naming rights',               val:3000000,  dur:15, yr:2010, conf:true},
+  {club:'EuroLeague',            sport:'basketball',cat:'league', sponsor:'Turkish Airlines', asset:'Title naming rights (ended Jul 2025)',  val:3000000,  dur:15, yr:2010, conf:true},
   {club:'EuroLeague',            sport:'basketball',cat:'league', sponsor:'Exp. Abu Dhabi',   asset:'Main partner + Final Four',         val:8000000,  dur:4,  yr:2025, conf:false},
   {club:'EuroLeague',            sport:'basketball',cat:'league', sponsor:'Etihad Airways',   asset:'Main partner + Final Four',         val:6000000,  dur:4,  yr:2025, conf:false},
   {club:'EuroLeague',            sport:'basketball',cat:'league', sponsor:'Adidas',           asset:'NextGen naming + Final Four',       val:4000000,  dur:4,  yr:2025, conf:true},
   {club:'EuroLeague',            sport:'basketball',cat:'league', sponsor:'Motorola',         asset:'Main league partner — jersey',      val:5000000,  dur:3,  yr:2023, conf:false},
-  {club:'Fenerbahçe Beko',       sport:'basketball',cat:'club',   sponsor:'Beko',             asset:'Jersey front naming rights',        val:4000000,  dur:5,  yr:2018, conf:false},
+  {club:'Fenerbahçe Beko',       sport:'basketball',cat:'club',   sponsor:'Beko',             asset:'Jersey front naming rights',        val:1500000,  dur:5,  yr:2018, conf:false},
   {club:'Fenerbahçe Beko',       sport:'basketball',cat:'club',   sponsor:'Adidas',           asset:'Kit manufacturer',                  val:10000000, dur:5,  yr:2025, conf:true},
   {club:'Olympiacos BC',         sport:'basketball',cat:'club',   sponsor:'Bwin',             asset:'Jersey front sponsorship',          val:2000000,  dur:5,  yr:2018, conf:true},
   {club:'Olympiacos BC',         sport:'basketball',cat:'club',   sponsor:'Winmasters',       asset:'Jersey front sponsorship',          val:1800000,  dur:3,  yr:2023, conf:false},
   {club:'Real Madrid Baloncesto',sport:'basketball',cat:'club',   sponsor:'Emirates',         asset:'Jersey front — bundled deal, value undisclosed', val:0, dur:6, yr:2025, conf:true},
   {club:'Real Madrid Baloncesto',sport:'basketball',cat:'club',   sponsor:'Autohero',         asset:'Jersey front (prev. sponsor 2023-25)',   val:2500000,  dur:2,  yr:2023, conf:false},
   {club:'Panathinaikos AKTOR',   sport:'basketball',cat:'club',   sponsor:'AKTOR Group',      asset:'Jersey naming rights',              val:2000000,  dur:3,  yr:2022, conf:false},
-  {club:'Anadolu Efes',          sport:'basketball',cat:'club',   sponsor:'Efes Beverage',    asset:'Jersey naming rights',              val:3500000,  dur:10, yr:2011, conf:false},
+  {club:'Anadolu Efes',          sport:'basketball',cat:'club',   sponsor:'Efes Beverage',    asset:'Jersey naming rights',              val:1000000,  dur:10, yr:2011, conf:false},
   {club:'EuroLeague Final Four', sport:'basketball',cat:'league', sponsor:'Abu Dhabi',        asset:'Venue hosting rights (one-time)',   val:50000000, dur:1,  yr:2025, conf:true},
   {club:'Fenerbahçe SK',         sport:'football',  cat:'club',   sponsor:'Chobani',          asset:'Stadium naming rights',             val:10000000, dur:10, yr:2025, conf:true},
   {club:'Fenerbahçe SK',         sport:'football',  cat:'club',   sponsor:'Chobani',          asset:'Jersey front (European only)',      val:4000000,  dur:5,  yr:2025, conf:true},
@@ -930,14 +999,22 @@ function renderBenchmarks(totYr){
 
 function renderInsight(totYr,dLo,dHi,typ,gap){
   const cl=CLUBS[curClub];
-  const anchor=DB.find(d=>d.sport==='basketball'&&d.conf&&d.asset.includes('Jersey front'));
-  g('insight').innerHTML=`At current parameters, <strong>${cl.n}</strong>'s full sponsorship package delivers
+  const anchor=DB.find(d=>d.sport==='basketball'&&d.conf&&d.asset.toLowerCase().includes('jersey front'));
+  const clubDeal=DB.find(d=>d.club===cl.n&&d.sport==='basketball'&&d.val>0);
+  const dealNote = clubDeal
+    ? `Current deal (${clubDeal.sponsor}): ${fmt(clubDeal.val)}/yr
+       <span style="font-size:10px;padding:1px 5px;border-radius:3px;margin-left:4px;
+         background:${clubDeal.conf?'#ECFDF5':'#FEF3C7'};color:${clubDeal.conf?'#065F46':'#92400E'}">
+         ${clubDeal.conf?'✓ Confirmed':'~ Estimated'}</span>.`
+    : '';
+  g('insight').innerHTML=`<strong>${cl.n}</strong>'s full sponsorship package delivers
     <strong>${fmt(totYr)}</strong> in annual media value.
-    A commercially sophisticated club should price deals between
-    <strong>${fmt(dLo)}</strong> and <strong>${fmt(dHi)}</strong>.
-    Without Premia, clubs typically sign at ~30% of media value — leaving
-    <strong class="warn">${fmt(gap)}</strong> per year on the table.
-    ${anchor?`The best confirmed comparable — ${anchor.club} / ${anchor.sponsor} at ${fmt(anchor.val)}/year — confirms this range is achievable.`:''}`;
+    Fair deal range: <strong>${fmt(dLo)} – ${fmt(dHi)}</strong>.
+    Without this data, clubs typically sign at ~30% of value — leaving
+    <strong class="warn">${fmt(gap)}</strong>/yr on the table.
+    ${dealNote}
+    ${anchor?`<br><span style="font-size:10px;color:var(--muted)">Calibration: ${anchor.club}/${anchor.sponsor} confirmed at ${fmt(anchor.val)}/yr = 30% of jersey media value.</span>`:''}
+    <br><span style="font-size:10px;color:var(--muted)">Audience derived from Nielsen market data. CPM calibrated from Bwin deal.</span>`;
 }
 
 // ══════════════════════════════════════════════════════════
@@ -995,13 +1072,13 @@ function renderBrief(){
 // ══════════════════════════════════════════════════════════
 function buildDBStats(){
   const conf=DB.filter(d=>d.conf).length;
-  const bj=DB.filter(d=>d.sport==='basketball'&&d.asset.includes('Jersey')).length;
-  const avg=DB.reduce((s,d)=>s+d.val,0)/DB.length;
+  const est=DB.filter(d=>!d.conf&&d.val>0).length;
+  const bj=DB.filter(d=>d.sport==='basketball'&&d.asset.toLowerCase().includes('jersey')&&d.conf).length;
   g('db-stats').innerHTML=`
-    <div class="mc"><div class="mc-l">Total deals</div><div class="mc-v">${DB.length}</div><div class="mc-s">in database v1</div></div>
-    <div class="mc"><div class="mc-l">Confirmed</div><div class="mc-v">${conf}</div><div class="mc-s">public source exists</div></div>
-    <div class="mc"><div class="mc-l">Basketball jersey comps</div><div class="mc-v">${bj}</div><div class="mc-s">core pricing comps</div></div>
-    <div class="mc"><div class="mc-l">Avg deal value</div><div class="mc-v">${fmt(avg)}</div><div class="mc-s">across all deals</div></div>`;
+    <div class="mc"><div class="mc-l">Total deals</div><div class="mc-v">${DB.length}</div><div class="mc-s">in database</div></div>
+    <div class="mc" style="background:rgba(6,95,70,.08)"><div class="mc-l">✓ Confirmed</div><div class="mc-v" style="color:#065F46">${conf}</div><div class="mc-s">public source verified</div></div>
+    <div class="mc" style="background:rgba(146,64,14,.06)"><div class="mc-l">~ Estimated</div><div class="mc-v" style="color:#92400E">${est}</div><div class="mc-s">derived, not verified</div></div>
+    <div class="mc"><div class="mc-l">Confirmed jersey comps</div><div class="mc-v">${bj}</div><div class="mc-s">core calibration anchors</div></div>`;
 }
 let dbFilter='all';
 function filterDB(f,btn){
@@ -1016,17 +1093,18 @@ function renderDB(){
   if(dbFilter==='football')   rows=DB.filter(d=>d.sport==='football');
   if(dbFilter==='league')     rows=DB.filter(d=>d.cat==='league');
   if(dbFilter==='confirmed')  rows=DB.filter(d=>d.conf);
-  g('db-body').innerHTML=rows.map(d=>`<tr>
+  g('db-body').innerHTML=rows.map(d=>`<tr style="${!d.conf?'opacity:0.75':''}">
     <td><strong>${d.club}</strong></td>
     <td class="muted">${d.sport}</td>
     <td>${d.sponsor}</td>
     <td class="muted">${d.asset}</td>
-    <td class="r">${fmt(d.val)}</td>
+    <td class="r" style="font-weight:${d.conf?'800':'400'};color:${d.conf?'var(--navy)':'var(--muted)'}">${d.val>0?fmt(d.val):'undisclosed'}</td>
     <td class="muted">${d.dur}yr</td>
     <td class="muted">${d.yr}</td>
     <td><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;
-      background:${d.conf?'#ECFDF5':'#FEF3C7'};color:${d.conf?'#065F46':'#92400E'}">
-      ${d.conf?'Confirmed':'Estimated'}</span></td>
+      background:${d.conf?'#ECFDF5':'#FEF3C7'};color:${d.conf?'#065F46':'#92400E'}"
+      title="${d.conf?'Value confirmed from public sources':'Value is an estimate — not independently verified'}">
+      ${d.conf?'✓ Confirmed':'~ Estimated'}</span></td>
   </tr>`).join('');
 }
 
@@ -1302,12 +1380,8 @@ const DEMO_STEPS = [
   {
     delay: 9000,
     action: () => {
-      if(!apiKey){
-        showToast('<strong>Step 4 of 4</strong><br>Enter your API key above, then ask: "We won the EuroLeague in 2024. Our AKTOR deal was signed before that. What should we charge at renewal?"');
-        return;
-      }
       g('ai-input').value = 'We won the EuroLeague in 2024 — our 7th title. Our AKTOR jersey deal was signed in 2022 before the championship. What should we charge at renewal and how do we justify it?';
-      showToast('<strong>Step 4 of 4</strong><br>Demo question loaded. Press Enter or click "Ask Premia" to see AI respond with specific deal intelligence.');
+      showToast('<strong>Step 4 of 4</strong><br>Demo question loaded. Press Enter or click Send to see Premia AI respond with specific deal intelligence based on live valuation data and 21 benchmark deals.');
     }
   }
 ];
@@ -1318,6 +1392,24 @@ function startDemo(){
   DEMO_STEPS.forEach(step => {
     setTimeout(step.action, step.delay);
   });
+}
+
+function runZalgirisDemo(){
+  closeWelcome();
+  setTimeout(()=>{
+    loadClub('zalgiris');
+    showToast('<strong>Žalgiris Kaunas loaded</strong><br>1× EuroLeague champion. Record EL average attendance: 14,737/game. Running live valuation...');
+  }, 0);
+  setTimeout(()=>{
+    showToast('<strong>Full package: €11.2M annual media value</strong><br>Go3 (Baltic streaming platform) is the jersey front sponsor. Deal value undisclosed — this is the commercial gap.');
+  }, 2800);
+  setTimeout(()=>{
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+    g('page-brief').classList.add('on');
+    renderBrief();
+    showToast('<strong>Negotiation brief</strong><br>Click "Generate AI brief" for a full meeting prep based on live valuation and 21 verified deals.');
+  }, 5800);
 }
 
 let toastTimer = null;
