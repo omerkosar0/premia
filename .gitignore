@@ -8,3 +8,5 @@ cv/frames/
 cv/frames_hd/
 cv/frame_*.jpg
 ~$*.xlsx
+flask/.env
+.env
