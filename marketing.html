@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premia — Sports Commercial Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #05091A;
+  --navy2: #0C1230;
+  --navy3: #111B40;
+  --gold: #C9A84C;
+  --gold2: #E8C96A;
+  --gold-dim: rgba(201,168,76,0.15);
+  --text: #F0EDE6;
+  --muted: rgba(240,237,230,0.45);
+  --border: rgba(201,168,76,0.12);
+  --border2: rgba(240,237,230,0.07);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--navy);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── CUSTOM CURSOR ── */
+#cursor {
+  position: fixed;
+  width: 10px; height: 10px;
+  background: var(--gold);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%,-50%);
+  transition: width .2s, height .2s, background .2s;
+  mix-blend-mode: difference;
+}
+#cursor-ring {
+  position: fixed;
+  width: 36px; height: 36px;
+  border: 1px solid rgba(201,168,76,0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%,-50%);
+  transition: transform 0.12s ease, width .3s, height .3s, opacity .3s;
+}
+body:has(a:hover) #cursor { width: 16px; height: 16px; }
+body:has(a:hover) #cursor-ring { width: 52px; height: 52px; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 24px 48px;
+  transition: padding .4s, background .4s, border .4s;
+}
+nav.scrolled {
+  padding: 16px 48px;
+  background: rgba(5,9,26,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 4px;
+  color: var(--text);
+  text-decoration: none;
+}
+.nav-logo span { color: var(--gold); }
+.nav-links { display: flex; gap: 36px; align-items: center; }
+.nav-links a {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color .2s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-cta {
+  background: var(--gold) !important;
+  color: var(--navy) !important;
+  padding: 10px 22px;
+  border-radius: 2px;
+  font-size: 11px !important;
+  letter-spacing: .14em !important;
+}
+
+/* ── HERO ── */
+.hero {
+  height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-court {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0.045;
+  transform-origin: center center;
+  will-change: transform;
+}
+.hero-court svg { width: 140%; height: 140%; }
+
+.hero-grain {
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+.hero-glow {
+  position: absolute;
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  text-align: center;
+  z-index: 2;
+  will-change: transform, opacity;
+}
+
+.hero-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 28px;
+  display: flex; align-items: center; gap: 12px;
+  justify-content: center;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: '';
+  width: 32px; height: 1px;
+  background: var(--gold);
+  opacity: 0.5;
+}
+
+.hero-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(52px, 8vw, 108px);
+  line-height: .92;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 28px;
+}
+.hero-title em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.hero-sub {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--muted);
+  max-width: 520px;
+  margin: 0 auto 48px;
+  line-height: 1.7;
+}
+
+.hero-ctas {
+  display: flex; gap: 16px; justify-content: center; align-items: center;
+}
+.btn-primary {
+  background: var(--gold);
+  color: var(--navy);
+  padding: 14px 32px;
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 2px;
+  transition: background .2s, transform .2s;
+  display: inline-block;
+}
+.btn-primary:hover { background: var(--gold2); transform: translateY(-1px); }
+.btn-ghost {
+  border: 1px solid rgba(201,168,76,0.3);
+  color: var(--text);
+  padding: 14px 32px;
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 2px;
+  transition: border-color .2s, transform .2s;
+}
+.btn-ghost:hover { border-color: var(--gold); transform: translateY(-1px); }
+
+.hero-stats {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 56px;
+  z-index: 2;
+}
+.hero-stat-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 32px;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.hero-stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 48px;
+  right: 48px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  z-index: 2;
+}
+.scroll-hint-line {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, transparent, var(--gold));
+  animation: scrollpulse 2s ease-in-out infinite;
+}
+.scroll-hint-text {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  writing-mode: vertical-rl;
+}
+@keyframes scrollpulse {
+  0%,100% { opacity: .3; }
+  50% { opacity: 1; }
+}
+
+/* ── MARQUEE ── */
+.marquee-section {
+  border-top: 1px solid var(--border2);
+  border-bottom: 1px solid var(--border2);
+  padding: 20px 0;
+  overflow: hidden;
+  background: rgba(201,168,76,0.03);
+}
+.marquee-track {
+  display: flex; gap: 0; width: max-content;
+  animation: marquee 28s linear infinite;
+}
+.marquee-item {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 40px;
+  white-space: nowrap;
+}
+.marquee-item span { color: var(--gold); margin-right: 40px; }
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── SECTIONS COMMON ── */
+section { position: relative; }
+
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.section-label::before {
+  content: '';
+  width: 24px; height: 1px;
+  background: var(--gold);
+}
+
+.section-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(38px, 5vw, 64px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+}
+.section-title em { font-style: italic; color: var(--gold); }
+
+.section-body {
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.75;
+  max-width: 520px;
+}
+
+/* ── PROBLEM SECTION ── */
+.problem {
+  padding: 140px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 120px;
+  align-items: center;
+}
+
+.problem-visual {
+  position: relative;
+}
+.imbalance-viz {
+  display: flex; align-items: flex-end; gap: 32px;
+  height: 280px;
+}
+.imbalance-col {
+  flex: 1;
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+.imbalance-bar {
+  border-radius: 3px 3px 0 0;
+  position: relative;
+  transition: height 1.2s cubic-bezier(.16,1,.3,1);
+}
+.bar-brand { background: linear-gradient(to top, #1a3a6e, #2d5bb5); }
+.bar-club  { background: linear-gradient(to top, #6b3b0a, var(--gold)); }
+.imbalance-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 12px;
+}
+.imbalance-val {
+  position: absolute;
+  top: -28px; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px;
+  white-space: nowrap;
+}
+.bar-brand .imbalance-val { color: #5b9bd5; }
+.bar-club  .imbalance-val { color: var(--gold); }
+.imbalance-divider {
+  width: 1px;
+  height: 100%;
+  background: var(--border2);
+  align-self: stretch;
+  margin: 0 8px;
+}
+
+/* ── PRODUCT SECTION ── */
+.product-section {
+  padding: 120px 48px;
+  background: var(--navy2);
+  position: relative;
+  overflow: hidden;
+}
+.product-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  opacity: 0.3;
+}
+.product-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  opacity: 0.3;
+}
+
+.product-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.product-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: end;
+  margin-bottom: 72px;
+}
+
+.product-screen {
+  background: var(--navy);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+.screen-titlebar {
+  background: var(--navy3);
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.screen-dot { width: 10px; height: 10px; border-radius: 50%; }
+.sd-r { background: #FF5F56; }
+.sd-y { background: #FFBD2E; }
+.sd-g { background: #27C93F; }
+.screen-url {
+  flex: 1;
+  background: rgba(255,255,255,0.04);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: 8px;
+}
+
+/* Valuation display inside screen */
+.screen-body { padding: 20px; }
+.screen-club-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.screen-club-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--text);
+}
+.screen-club-sub {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.screen-badge {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 2px;
+  background: var(--gold-dim);
+  color: var(--gold);
+  border: 1px solid rgba(201,168,76,0.2);
+}
+
+.screen-kpis {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px; margin-bottom: 18px;
+}
+.screen-kpi {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 12px;
+}
+.screen-kpi-label {
+  font-size: 9px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 5px;
+}
+.screen-kpi-val {
+  font-family: 'DM Serif Display', serif;
+  font-size: 19px; color: var(--text); line-height: 1;
+}
+.screen-kpi-val.gold { color: var(--gold); }
+
+.screen-assets { display: flex; flex-direction: column; gap: 7px; }
+.screen-asset-row {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 11px;
+}
+.screen-asset-name { color: var(--muted); flex: 1; }
+.screen-asset-bar-wrap {
+  flex: 2;
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.screen-asset-bar {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--gold), var(--gold2));
+}
+.screen-asset-val { color: var(--text); font-weight: 600; width: 52px; text-align: right; font-size: 10px; }
+
+/* ── HOW IT WORKS ── */
+.how-section {
+  padding: 140px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 72px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.step-card {
+  padding: 48px 40px;
+  background: var(--navy2);
+  border-right: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  transition: background .3s;
+}
+.step-card:last-child { border-right: none; }
+.step-card:hover { background: var(--navy3); }
+.step-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(to right, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.step-card:hover::before { opacity: 1; }
+
+.step-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 72px;
+  color: rgba(201,168,76,0.08);
+  line-height: 1;
+  margin-bottom: 24px;
+  position: absolute;
+  top: 20px; right: 28px;
+}
+.step-icon {
+  width: 44px; height: 44px;
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 24px;
+  font-size: 18px;
+}
+.step-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--text); margin-bottom: 12px;
+}
+.step-body {
+  font-size: 14px; color: var(--muted); line-height: 1.7;
+}
+
+/* ── BENCHMARK SECTION ── */
+.bench-section {
+  padding: 120px 48px;
+  background: var(--navy2);
+  position: relative;
+}
+.bench-section::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  opacity: 0.25;
+}
+
+.bench-inner { max-width: 1200px; margin: 0 auto; }
+.bench-header {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: end; margin-bottom: 64px;
+}
+
+.bench-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.bench-table { width: 100%; border-collapse: collapse; }
+.bench-table thead tr {
+  background: rgba(201,168,76,0.05);
+  border-bottom: 1px solid var(--border);
+}
+.bench-table th {
+  padding: 12px 16px;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: .15em; text-transform: uppercase;
+  color: var(--muted); text-align: left;
+}
+.bench-table tbody tr {
+  border-bottom: 1px solid var(--border2);
+  transition: background .15s;
+}
+.bench-table tbody tr:last-child { border-bottom: none; }
+.bench-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+.bench-table td {
+  padding: 14px 16px;
+  font-size: 13px; color: var(--text);
+}
+.bench-table td.muted { color: var(--muted); font-size: 12px; }
+.bench-table td.val { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--gold); }
+.bench-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; padding: 3px 8px; border-radius: 2px;
+}
+.bb-c { background: rgba(6,95,70,0.3); color: #6ee7b7; border: 1px solid rgba(6,95,70,0.4); }
+.bb-e { background: rgba(146,64,14,0.25); color: #fbbf24; border: 1px solid rgba(146,64,14,0.3); }
+
+/* ── CLUBS SECTION ── */
+.clubs-section {
+  padding: 140px 48px;
+  max-width: 1200px; margin: 0 auto;
+}
+
+.clubs-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border2);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 64px;
+}
+.club-tile {
+  background: var(--navy2);
+  padding: 28px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: background .25s;
+}
+.club-tile:hover { background: var(--navy3); }
+.club-tile::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0;
+  width: 0; height: 2px;
+  background: var(--gold);
+  transition: width .35s ease;
+}
+.club-tile:hover::after { width: 100%; }
+.club-tile-name {
+  font-size: 13px; font-weight: 700;
+  color: var(--text); margin-bottom: 4px;
+}
+.club-tile-country {
+  font-size: 10px; font-weight: 600; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 16px;
+}
+.club-tile-val {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px; color: var(--gold); line-height: 1;
+  margin-bottom: 2px;
+}
+.club-tile-sublabel {
+  font-size: 9px; font-weight: 600; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+/* ── TESTIMONIAL / QUOTE ── */
+.quote-section {
+  padding: 120px 48px;
+  background: var(--navy2);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.quote-section::before {
+  content: '';
+  position: absolute; top: 50%; left: 50%;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(201,168,76,0.05) 0%, transparent 70%);
+  transform: translate(-50%,-50%);
+}
+
+.quote-mark {
+  font-family: 'DM Serif Display', serif;
+  font-size: 120px; line-height: .7;
+  color: rgba(201,168,76,0.15);
+  margin-bottom: -20px;
+  display: block;
+}
+.quote-text {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: clamp(24px, 3.5vw, 42px);
+  line-height: 1.3;
+  max-width: 820px;
+  margin: 0 auto 32px;
+  color: var(--text);
+  position: relative;
+}
+.quote-text em { color: var(--gold); font-style: normal; }
+.quote-source {
+  font-size: 12px; font-weight: 600; letter-spacing: .15em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+/* ── CTA SECTION ── */
+.cta-section {
+  padding: 160px 48px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-glow {
+  position: absolute; top: 50%; left: 50%;
+  width: 800px; height: 800px;
+  background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 65%);
+  transform: translate(-50%,-50%);
+  pointer-events: none;
+}
+.cta-section .section-label { justify-content: center; }
+.cta-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(44px, 7vw, 96px);
+  line-height: .95;
+  letter-spacing: -0.02em;
+  margin-bottom: 28px;
+}
+.cta-title em { font-style: italic; color: var(--gold); }
+.cta-sub {
+  font-size: 16px; color: var(--muted); margin-bottom: 48px;
+  max-width: 480px; margin-left: auto; margin-right: auto; line-height: 1.7;
+}
+.cta-buttons { display: flex; gap: 16px; justify-content: center; }
+
+/* ── FOOTER ── */
+footer {
+  padding: 48px;
+  border-top: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.footer-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 4px;
+  color: var(--muted);
+}
+.footer-logo span { color: var(--gold); }
+.footer-copy {
+  font-size: 11px; color: rgba(240,237,230,0.25);
+  letter-spacing: .06em;
+}
+.footer-links { display: flex; gap: 28px; }
+.footer-links a {
+  font-size: 11px; font-weight: 600; letter-spacing: .12em;
+  text-transform: uppercase; color: rgba(240,237,230,0.3);
+  text-decoration: none; transition: color .2s;
+}
+.footer-links a:hover { color: var(--gold); }
+
+/* ── SCROLL REVEAL ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: .1s; }
+.reveal-delay-2 { transition-delay: .2s; }
+.reveal-delay-3 { transition-delay: .3s; }
+.reveal-delay-4 { transition-delay: .4s; }
+
+/* ── LINE DECORATION ── */
+.gold-line {
+  display: inline-block;
+  width: 40px; height: 1px;
+  background: var(--gold);
+  vertical-align: middle;
+  margin-right: 12px;
+  opacity: 0.6;
+}
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- Nav -->
+<nav id="nav">
+  <a href="#" class="nav-logo">PREMIA<span>.</span></a>
+  <div class="nav-links">
+    <a href="#product">Product</a>
+    <a href="#how">How it works</a>
+    <a href="#benchmarks">Benchmarks</a>
+    <a href="#clubs">Clubs</a>
+    <a href="https://omerkosar0.github.io/premia" class="nav-cta">Launch app →</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="top">
+  <div class="hero-court">
+    <svg viewBox="0 0 900 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Full court outline -->
+      <rect x="50" y="50" width="800" height="500" stroke="#C9A84C" stroke-width="2"/>
+      <!-- Center line -->
+      <line x1="450" y1="50" x2="450" y2="550" stroke="#C9A84C" stroke-width="1.5"/>
+      <!-- Center circle -->
+      <circle cx="450" cy="300" r="70" stroke="#C9A84C" stroke-width="1.5"/>
+      <circle cx="450" cy="300" r="4" fill="#C9A84C"/>
+      <!-- Left paint -->
+      <rect x="50" y="200" width="190" height="200" stroke="#C9A84C" stroke-width="1.5"/>
+      <!-- Left free throw circle -->
+      <path d="M 240 200 A 70 70 0 0 1 240 400" stroke="#C9A84C" stroke-width="1.5" fill="none"/>
+      <!-- Left 3pt arc -->
+      <path d="M 50 185 L 165 185" stroke="#C9A84C" stroke-width="1.5"/>
+      <path d="M 50 415 L 165 415" stroke="#C9A84C" stroke-width="1.5"/>
+      <path d="M 165 185 A 200 200 0 0 1 165 415" stroke="#C9A84C" stroke-width="1.5" fill="none"/>
+      <!-- Left basket -->
+      <circle cx="115" cy="300" r="22" stroke="#C9A84C" stroke-width="1.5"/>
+      <circle cx="115" cy="300" r="4" fill="#C9A84C" opacity="0.5"/>
+      <!-- Right paint -->
+      <rect x="660" y="200" width="190" height="200" stroke="#C9A84C" stroke-width="1.5"/>
+      <!-- Right free throw circle -->
+      <path d="M 660 200 A 70 70 0 0 0 660 400" stroke="#C9A84C" stroke-width="1.5" fill="none"/>
+      <!-- Right 3pt arc -->
+      <path d="M 850 185 L 735 185" stroke="#C9A84C" stroke-width="1.5"/>
+      <path d="M 850 415 L 735 415" stroke="#C9A84C" stroke-width="1.5"/>
+      <path d="M 735 185 A 200 200 0 0 0 735 415" stroke="#C9A84C" stroke-width="1.5" fill="none"/>
+      <!-- Right basket -->
+      <circle cx="785" cy="300" r="22" stroke="#C9A84C" stroke-width="1.5"/>
+      <circle cx="785" cy="300" r="4" fill="#C9A84C" opacity="0.5"/>
+    </svg>
+  </div>
+  <div class="hero-grain"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-content" id="hero-content">
+    <div class="hero-eyebrow">EuroLeague Commercial Intelligence</div>
+    <h1 class="hero-title">
+      Know what your<br>
+      <em>assets are worth.</em>
+    </h1>
+    <p class="hero-sub">AI-powered sponsorship valuation for European basketball clubs. Stop leaving money on the table.</p>
+    <div class="hero-ctas">
+      <a href="https://omerkosar0.github.io/premia" class="btn-primary">Open Premia →</a>
+      <a href="#product" class="btn-ghost">See how it works</a>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-num" data-count="11">0</div>
+      <div class="hero-stat-label">EL clubs modelled</div>
+    </div>
+    <div>
+      <div class="hero-stat-num" data-count="21">0</div>
+      <div class="hero-stat-label">Verified deals</div>
+    </div>
+    <div>
+      <div class="hero-stat-num" data-prefix="€" data-count="459" data-suffix="M">0</div>
+      <div class="hero-stat-label">EL TV viewers 2024–25</div>
+    </div>
+    <div>
+      <div class="hero-stat-num" data-count="30" data-suffix="%">0</div>
+      <div class="hero-stat-label">Clubs sign at of media value</div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span class="scroll-hint-text">Scroll</span>
+    <div class="scroll-hint-line"></div>
+  </div>
+</section>
+
+<!-- Marquee -->
+<div class="marquee-section">
+  <div class="marquee-track" id="marquee">
+    <div class="marquee-item"><span>◈</span> Fenerbahçe Beko</div>
+    <div class="marquee-item"><span>◈</span> Real Madrid Baloncesto</div>
+    <div class="marquee-item"><span>◈</span> Panathinaikos AKTOR</div>
+    <div class="marquee-item"><span>◈</span> Olympiacos BC</div>
+    <div class="marquee-item"><span>◈</span> FC Bayern Munich</div>
+    <div class="marquee-item"><span>◈</span> AS Monaco Basket</div>
+    <div class="marquee-item"><span>◈</span> Žalgiris Kaunas</div>
+    <div class="marquee-item"><span>◈</span> FC Barcelona Basketball</div>
+    <div class="marquee-item"><span>◈</span> EA7 Emporio Armani</div>
+    <div class="marquee-item"><span>◈</span> Kosner Baskonia</div>
+    <div class="marquee-item"><span>◈</span> Anadolu Efes</div>
+    <div class="marquee-item"><span>◈</span> Fenerbahçe Beko</div>
+    <div class="marquee-item"><span>◈</span> Real Madrid Baloncesto</div>
+    <div class="marquee-item"><span>◈</span> Panathinaikos AKTOR</div>
+    <div class="marquee-item"><span>◈</span> Olympiacos BC</div>
+    <div class="marquee-item"><span>◈</span> FC Bayern Munich</div>
+    <div class="marquee-item"><span>◈</span> AS Monaco Basket</div>
+    <div class="marquee-item"><span>◈</span> Žalgiris Kaunas</div>
+    <div class="marquee-item"><span>◈</span> FC Barcelona Basketball</div>
+    <div class="marquee-item"><span>◈</span> EA7 Emporio Armani</div>
+    <div class="marquee-item"><span>◈</span> Kosner Baskonia</div>
+    <div class="marquee-item"><span>◈</span> Anadolu Efes</div>
+  </div>
+</div>
+
+<!-- Problem section -->
+<div class="problem" id="problem">
+  <div class="reveal">
+    <div class="section-label">The problem</div>
+    <h2 class="section-title">Brands have<br>data. <em>Clubs have<br>instinct.</em></h2>
+    <p class="section-body" style="margin-top: 20px">
+      Nielsen tells Adidas what their Fenerbahçe deal delivered last season. Relo Metrics tells every brand exactly what they received.
+      <br><br>
+      Clubs walk into renewal negotiations with nothing. No data. No benchmarks. No leverage. They sign at 30% of what their assets are worth.
+    </p>
+    <div style="margin-top: 40px; display: flex; gap: 32px;">
+      <div>
+        <div style="font-family: 'DM Serif Display', serif; font-size: 42px; color: var(--gold); line-height: 1;">30%</div>
+        <div style="font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 4px;">Clubs get of true value</div>
+      </div>
+      <div style="width: 1px; background: var(--border2);"></div>
+      <div>
+        <div style="font-family: 'DM Serif Display', serif; font-size: 42px; color: var(--text); line-height: 1;">70%</div>
+        <div style="font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 4px;">Left on the table</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal reveal-delay-2">
+    <div class="imbalance-viz" id="imbalance-viz">
+      <div class="imbalance-col">
+        <div class="imbalance-bar bar-brand" id="bar-brand" style="height: 0px;">
+          <span class="imbalance-val">Nielsen · Relo Metrics</span>
+        </div>
+        <div class="imbalance-label">Brands</div>
+      </div>
+      <div class="imbalance-divider"></div>
+      <div class="imbalance-col">
+        <div class="imbalance-bar bar-club" id="bar-club" style="height: 0px;">
+          <span class="imbalance-val" style="color: var(--gold);">Premia</span>
+        </div>
+        <div class="imbalance-label">Clubs</div>
+      </div>
+    </div>
+    <p style="font-size:12px; color:var(--muted); margin-top: 16px; font-style: italic;">Data intelligence available to each side of the negotiation table</p>
+  </div>
+</div>
+
+<!-- Product section -->
+<div class="product-section" id="product">
+  <div class="product-inner">
+    <div class="product-header">
+      <div class="reveal">
+        <div class="section-label">The product</div>
+        <h2 class="section-title">Live intelligence.<br><em>Not spreadsheets.</em></h2>
+      </div>
+      <div class="reveal reveal-delay-1">
+        <p class="section-body">A commercial director can run the full valuation, see every comparable deal, and generate a complete AI negotiation brief in under 90 seconds. Before every renewal meeting.</p>
+      </div>
+    </div>
+
+    <!-- Product screen mockup -->
+    <div class="product-screen reveal">
+      <div class="screen-titlebar">
+        <div class="screen-dot sd-r"></div>
+        <div class="screen-dot sd-y"></div>
+        <div class="screen-dot sd-g"></div>
+        <div class="screen-url">app.premia.io/valuation</div>
+      </div>
+      <div class="screen-body">
+        <div class="screen-club-row">
+          <div>
+            <div class="screen-club-name">Panathinaikos AKTOR Athens</div>
+            <div class="screen-club-sub">EuroLeague · Greece · 7× European Champion</div>
+          </div>
+          <div class="screen-badge">2024 EuroLeague Champions</div>
+        </div>
+
+        <div class="screen-kpis">
+          <div class="screen-kpi">
+            <div class="screen-kpi-label">Annual media value</div>
+            <div class="screen-kpi-val gold">€19.1M</div>
+          </div>
+          <div class="screen-kpi">
+            <div class="screen-kpi-label">Fair deal range</div>
+            <div class="screen-kpi-val">€7.6–11.5M</div>
+          </div>
+          <div class="screen-kpi">
+            <div class="screen-kpi-label">Left on table</div>
+            <div class="screen-kpi-val" style="color:#ef4444">€3.8M/yr</div>
+          </div>
+        </div>
+
+        <div class="screen-assets">
+          <div class="screen-asset-row">
+            <div class="screen-asset-name">Jersey front</div>
+            <div class="screen-asset-bar-wrap"><div class="screen-asset-bar" style="width:100%"></div></div>
+            <div class="screen-asset-val">€8.2M</div>
+          </div>
+          <div class="screen-asset-row">
+            <div class="screen-asset-name">Kit manufacturer</div>
+            <div class="screen-asset-bar-wrap"><div class="screen-asset-bar" style="width:55%"></div></div>
+            <div class="screen-asset-val">€4.5M</div>
+          </div>
+          <div class="screen-asset-row">
+            <div class="screen-asset-name">LED perimeter boards</div>
+            <div class="screen-asset-bar-wrap"><div class="screen-asset-bar" style="width:26%"></div></div>
+            <div class="screen-asset-val">€2.1M</div>
+          </div>
+          <div class="screen-asset-row">
+            <div class="screen-asset-name">Jersey back</div>
+            <div class="screen-asset-bar-wrap"><div class="screen-asset-bar" style="width:22%"></div></div>
+            <div class="screen-asset-val">€1.8M</div>
+          </div>
+          <div class="screen-asset-row">
+            <div class="screen-asset-name">Press backdrop</div>
+            <div class="screen-asset-bar-wrap"><div class="screen-asset-bar" style="width:12%"></div></div>
+            <div class="screen-asset-val">€0.9M</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- How it works -->
+<div class="how-section" id="how">
+  <div class="reveal">
+    <div class="section-label">How it works</div>
+    <h2 class="section-title">From zero to<br><em>negotiation-ready</em><br>in 90 seconds.</h2>
+  </div>
+
+  <div class="steps-grid">
+    <div class="step-card reveal">
+      <div class="step-num">01</div>
+      <div class="step-icon">◈</div>
+      <div class="step-title">Select your club</div>
+      <div class="step-body">11 EuroLeague clubs pre-loaded with verified audience data, market CPM rates, and club intelligence. Select yours and the model runs instantly.</div>
+    </div>
+    <div class="step-card reveal reveal-delay-1">
+      <div class="step-num">02</div>
+      <div class="step-icon">◉</div>
+      <div class="step-title">Live valuation</div>
+      <div class="step-body">Every sponsorship asset — jersey front, LED boards, press backdrop, broadcast overlay — valued independently using the Nielsen QI methodology, calibrated from confirmed deals.</div>
+    </div>
+    <div class="step-card reveal reveal-delay-2">
+      <div class="step-num">03</div>
+      <div class="step-icon">✦</div>
+      <div class="step-title">AI negotiation brief</div>
+      <div class="step-body">Claude AI reasons over your live valuation and 21 verified deal benchmarks to write a complete meeting brief — exact talking points, figures, and comparable deals to cite.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Benchmarks -->
+<div class="bench-section" id="benchmarks">
+  <div class="bench-inner">
+    <div class="bench-header">
+      <div class="reveal">
+        <div class="section-label">Benchmark database</div>
+        <h2 class="section-title">21 verified<br><em>real deals.</em></h2>
+      </div>
+      <div class="reveal reveal-delay-1">
+        <p class="section-body">Every deal your competitors signed. Every league-level sponsorship. Confirmed from public sources where available, clearly flagged as estimated where not. No fabricated data.</p>
+        <div style="margin-top: 28px; display: flex; gap: 24px;">
+          <div>
+            <div style="font-family:'DM Serif Display',serif; font-size:32px; color:#6ee7b7; line-height:1">8</div>
+            <div style="font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-top:4px">✓ Confirmed</div>
+          </div>
+          <div style="width:1px; background:var(--border2)"></div>
+          <div>
+            <div style="font-family:'DM Serif Display',serif; font-size:32px; color:#fbbf24; line-height:1">13</div>
+            <div style="font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-top:4px">~ Estimated</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bench-table-wrap reveal">
+      <table class="bench-table">
+        <thead>
+          <tr>
+            <th>Club</th>
+            <th>Sponsor</th>
+            <th>Asset</th>
+            <th>Value</th>
+            <th>Year</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>EuroLeague Final Four</strong></td>
+            <td>Abu Dhabi</td>
+            <td class="muted">Venue hosting rights</td>
+            <td class="val">€50M</td>
+            <td class="muted">2025</td>
+            <td><span class="bench-badge bb-c">✓ Confirmed</span></td>
+          </tr>
+          <tr>
+            <td><strong>Fenerbahçe Beko</strong></td>
+            <td>Adidas</td>
+            <td class="muted">Kit manufacturer</td>
+            <td class="val">€10M</td>
+            <td class="muted">2025</td>
+            <td><span class="bench-badge bb-c">✓ Confirmed</span></td>
+          </tr>
+          <tr>
+            <td><strong>Real Madrid CF</strong></td>
+            <td>Emirates</td>
+            <td class="muted">Jersey front</td>
+            <td class="val">€70M</td>
+            <td class="muted">2022</td>
+            <td><span class="bench-badge bb-c">✓ Confirmed</span></td>
+          </tr>
+          <tr>
+            <td><strong>Olympiacos BC</strong></td>
+            <td>Bwin</td>
+            <td class="muted">Jersey front</td>
+            <td class="val">€2.0M</td>
+            <td class="muted">2018</td>
+            <td><span class="bench-badge bb-c">✓ Confirmed</span></td>
+          </tr>
+          <tr>
+            <td><strong>EuroLeague</strong></td>
+            <td>Turkish Airlines</td>
+            <td class="muted">Title naming rights</td>
+            <td class="val">€3.0M</td>
+            <td class="muted">2010</td>
+            <td><span class="bench-badge bb-c">✓ Confirmed</span></td>
+          </tr>
+          <tr>
+            <td><strong>Panathinaikos</strong></td>
+            <td>AKTOR Group</td>
+            <td class="muted">Jersey naming</td>
+            <td class="val">€2.0M</td>
+            <td class="muted">2022</td>
+            <td><span class="bench-badge bb-e">~ Estimated</span></td>
+          </tr>
+          <tr>
+            <td><strong>Real Madrid Baloncesto</strong></td>
+            <td>Emirates</td>
+            <td class="muted">Jersey front (Sep 2025)</td>
+            <td class="val">Undisclosed</td>
+            <td class="muted">2025</td>
+            <td><span class="bench-badge bb-c">✓ Confirmed</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Clubs -->
+<div class="clubs-section" id="clubs">
+  <div class="reveal">
+    <div class="section-label">Coverage</div>
+    <h2 class="section-title">11 clubs.<br><em>Every asset.<br>Every market.</em></h2>
+  </div>
+
+  <div class="clubs-grid">
+    <div class="club-tile reveal">
+      <div class="club-tile-name">Panathinaikos AKTOR</div>
+      <div class="club-tile-country">Greece</div>
+      <div class="club-tile-val">€19.1M</div>
+      <div class="club-tile-sublabel">Annual media value</div>
+    </div>
+    <div class="club-tile reveal reveal-delay-1">
+      <div class="club-tile-name">Real Madrid Baloncesto</div>
+      <div class="club-tile-country">Spain</div>
+      <div class="club-tile-val">€19.8M</div>
+      <div class="club-tile-sublabel">Annual media value</div>
+    </div>
+    <div class="club-tile reveal reveal-delay-2">
+      <div class="club-tile-name">Olympiacos BC</div>
+      <div class="club-tile-country">Greece</div>
+      <div class="club-tile-val">€15.7M</div>
+      <div class="club-tile-sublabel">Annual media value</div>
+    </div>
+    <div class="club-tile reveal reveal-delay-3">
+      <div class="club-tile-name">FC Barcelona Basketball</div>
+      <div class="club-tile-country">Spain</div>
+      <div class="club-tile-val">€13.2M</div>
+      <div class="club-tile-sublabel">Annual media value</div>
+    </div>
+    <div class="club-tile reveal">
+      <div class="club-tile-name">FC Bayern Munich</div>
+      <div class="club-tile-country">Germany</div>
+      <div class="club-tile-val">€10.4M</div>
+      <div class="club-tile-sublabel">Annual media value</div>
+    </div>
+    <div class="club-tile reveal reveal-delay-1">
+      <div class="club-tile-name">Fenerbahçe Beko</div>
+      <div class="club-tile-country">Turkey</div>
+      <div class="club-tile-val">€7.4M</div>
+      <div class="club-tile-sublabel">Annual media value</div>
+    </div>
+    <div class="club-tile reveal reveal-delay-2">
+      <div class="club-tile-name">EA7 Emporio Armani</div>
+      <div class="club-tile-country">Italy</div>
+      <div class="club-tile-val">€7.9M</div>
+      <div class="club-tile-sublabel">Annual media value</div>
+    </div>
+    <div class="club-tile reveal reveal-delay-3">
+      <div class="club-tile-name">AS Monaco Basket</div>
+      <div class="club-tile-country">France</div>
+      <div class="club-tile-val">€4.1M</div>
+      <div class="club-tile-sublabel">Annual media value</div>
+    </div>
+    <div class="club-tile reveal">
+      <div class="club-tile-name">Kosner Baskonia</div>
+      <div class="club-tile-country">Spain</div>
+      <div class="club-tile-val">€4.7M</div>
+      <div class="club-tile-sublabel">Annual media value</div>
+    </div>
+    <div class="club-tile reveal reveal-delay-1">
+      <div class="club-tile-name">Anadolu Efes</div>
+      <div class="club-tile-country">Turkey</div>
+      <div class="club-tile-val">€3.9M</div>
+      <div class="club-tile-sublabel">Annual media value</div>
+    </div>
+    <div class="club-tile reveal reveal-delay-2">
+      <div class="club-tile-name">Žalgiris Kaunas</div>
+      <div class="club-tile-country">Lithuania</div>
+      <div class="club-tile-val">€1.6M</div>
+      <div class="club-tile-sublabel">Annual media value</div>
+    </div>
+    <div class="club-tile reveal reveal-delay-3" style="display:flex; align-items:center; justify-content:center; background:rgba(201,168,76,0.03); border:1px dashed rgba(201,168,76,0.15);">
+      <div style="text-align:center">
+        <div style="font-size:22px; color:var(--gold); margin-bottom:8px">+</div>
+        <div style="font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted)">More clubs<br>coming</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quote -->
+<div class="quote-section">
+  <span class="quote-mark">"</span>
+  <p class="quote-text">
+    The commercial gap in European basketball is enormous.<br>
+    Clubs have <em>no data</em> on what their assets deliver.<br>
+    Premia changes that.
+  </p>
+  <div class="quote-source">The information asymmetry we're closing</div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="cta-glow"></div>
+  <div class="section-label">Get started</div>
+  <h2 class="cta-title">Stop leaving<br><em>money</em><br>on the table.</h2>
+  <p class="cta-sub">Run a full valuation on your club in 30 seconds. See every asset. Generate your negotiation brief. No setup required.</p>
+  <div class="cta-buttons">
+    <a href="https://omerkosar0.github.io/premia" class="btn-primary">Open Premia — it's free →</a>
+    <a href="mailto:omer@premia.io" class="btn-ghost">Talk to us</a>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">PREMIA<span>.</span></div>
+  <div class="footer-copy">© 2026 Premia. Sports Commercial Intelligence.</div>
+  <div class="footer-links">
+    <a href="https://omerkosar0.github.io/premia">App</a>
+    <a href="https://github.com/omerkosar0/premia">GitHub</a>
+    <a href="mailto:omer@premia.io">Contact</a>
+  </div>
+</footer>
+
+<script>
+// ── CURSOR ──────────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top  = my + 'px';
+});
+
+function animateRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top  = ry + 'px';
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+
+// ── NAV SCROLL ──────────────────────────────────────────
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// ── SCROLL-DRIVEN HERO ──────────────────────────────────
+const heroContent = document.getElementById('hero-content');
+const heroCourtEl = document.querySelector('.hero-court');
+
+window.addEventListener('scroll', () => {
+  const sy = window.scrollY;
+  const vh = window.innerHeight;
+
+  // Hero content fades and rises
+  if (sy < vh) {
+    const prog = sy / vh;
+    heroContent.style.transform = `translateY(${prog * -60}px)`;
+    heroContent.style.opacity   = 1 - prog * 1.6;
+  }
+
+  // Court zooms in as you scroll
+  if (sy < vh * 1.2) {
+    const prog = sy / (vh * 1.2);
+    const scale = 1 + prog * 0.35;
+    heroCourtEl.style.transform = `scale(${scale})`;
+  }
+}, { passive: true });
+
+// ── COUNTER ANIMATION ───────────────────────────────────
+function animateCount(el) {
+  const target  = parseInt(el.dataset.count);
+  const prefix  = el.dataset.prefix  || '';
+  const suffix  = el.dataset.suffix  || '';
+  const dur     = 1400;
+  const start   = performance.now();
+  function step(now) {
+    const prog = Math.min((now - start) / dur, 1);
+    const ease = 1 - Math.pow(1 - prog, 3);
+    el.textContent = prefix + Math.round(ease * target) + suffix;
+    if (prog < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// ── BAR ANIMATION ───────────────────────────────────────
+function animateBars() {
+  document.getElementById('bar-brand').style.height = '240px';
+  document.getElementById('bar-club').style.height  = '80px';
+}
+
+// ── INTERSECTION OBSERVER ───────────────────────────────
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+
+      if (entry.target.dataset.count) {
+        animateCount(entry.target);
+      }
+      if (entry.target.id === 'imbalance-viz') {
+        setTimeout(animateBars, 200);
+      }
+
+      io.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.reveal, [data-count]').forEach(el => io.observe(el));
+document.getElementById('imbalance-viz') && io.observe(document.getElementById('imbalance-viz'));
+</script>
+</body>
+</html>
